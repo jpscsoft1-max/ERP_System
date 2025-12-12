@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Company Info</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .company-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.company-gallery img {
+  width: 80%;
+  min-width: 250px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+  </style>
+
+  <script>
+    // Placed in <head> to prevent page from loading unauthorized content      
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "login.html";
+    }
+  </script>
+
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon">🔔</span>
+        <span class="profile-icon">👤 Admin</span>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <h1>This is our information.</h1>
+    <p>Have a grand look.</p>
+    <div class="company-gallery">
+      <img src="companyinfo1.jpg" alt="Company Info 1">
+      <img src="companyinfo2.jpg" alt="Company Info 2">
+      <img src="companyinfo3.jpg" alt="Company Info 3">
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.history.back(); // Go to previous page
+    }
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+    // Get the current page file name
+    const currentPage = window.location.pathname.split("/").pop();
+
+    // Get all sidebar links
+    const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
+
+    sidebarLinks.forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+  </script>
+  <script src="js/rolepermission.js"></script>
+</body>
+
+</html>

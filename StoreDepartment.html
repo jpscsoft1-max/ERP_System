@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Store Department</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 60%;
+      margin-top: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 40px;
+    }
+
+    th,
+    td {
+      text-align: center;
+      padding: 12px;
+    }
+
+    th {
+      background-color: #f4f4f4;
+      color: #000000;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #ffffff;
+    }
+
+    tr:hover {
+      background-color: #eaf9ff;
+    }
+
+    /* --- Modern Upgrade for inventoryTable (non-destructive) --- */
+.inventoryTable {
+  width: 100% !important;
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12) !important;
+  font-family: 'Segoe UI', sans-serif !important;
+  font-size: 15px !important;
+  border-collapse: collapse !important;
+}
+
+/* Modern Green Header (#1abc9c) */
+.inventoryTable thead tr,
+.inventoryTable thead th {
+  background-color: #1abc9c !important;
+  color: white !important;
+  text-align: center !important;
+  padding: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* Table Cells */
+.inventoryTable td {
+  padding: 12px !important;
+  text-align: center !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+/* Hover Row */
+.inventoryTable tbody tr:hover {
+  background-color: #f8fdfc !important;
+}
+
+/* Remove old borders for modern clean look */
+.inventoryTable,
+.inventoryTable th,
+.inventoryTable td {
+  border: none !important;
+}
+/* Restore clean vertical lines with modern thin borders */
+.inventoryTable th,
+.inventoryTable td {
+  border-bottom: 1px solid #e0e0e0 !important;
+  border-right: 1px solid #e0e0e0 !important;
+}
+
+/* Remove right border on last column for clean edge */
+.inventoryTable th:last-child,
+.inventoryTable td:last-child {
+  border-right: none !important;
+}
+
+/* Keep outer border subtle */
+.inventoryTable {
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 12px !important;
+}
+
+
+    /* Inventory Form Inputs */
+    #inventoryForm input,
+    #inventoryForm select,
+    #inventoryForm button {
+      padding: 8px 12px;
+      margin: 6px 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    /* On focus */
+    #inventoryForm input:focus,
+    #inventoryForm select:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+    }
+
+    /* Submit Button */
+    #inventoryForm button {
+      background-color: #1abc9c;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    #inventoryForm button:hover {
+      background-color: #24d5b2;
+    }
+
+    /* Styling the Category Filter outside form */
+    #categoryFilter {
+      padding: 8px 12px;
+      width: 15%;
+      margin-left: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    #categoryFilter:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon" onclick="toggleNotification()">🔔</span>
+        <span class="profile-icon" onclick="toggleProfileDropdown()">👤 Admin</span>
+      </div>
+      <div id="notificationDropdown" class="dropdown-menu" style="display: none;">
+        <a href="#">No new notifications</a>
+      </div>
+      <div id="profileDropdown" class="dropdown-menu" style="display: none;">
+        <a href="#">Profile</a>
+        <a href="login.html">Logout</a>
+      </div>
+    </div>
+  </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Store Department</h1>
+    <h2>Store Employees </h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Sr No</th>
+          <th>Name</th>
+          <th>Emp ID</th>
+          <th>Mob No</th>
+        </tr>
+      </thead>
+      <tbody id="storeDepartmentTable"></tbody>
+    </table>
+    <hr> <br>
+    <h2>Inventory</h2>
+
+    <!-- Filter Dropdown -->
+    <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+      <label for="categoryFilter"><b>Filter by Category:</b></label>
+      <select id="categoryFilter">
+        <option value="All">All</option>
+        <option value="Raw Material">Raw Material</option>
+        <option value="Finished Goods">Finished Goods</option>
+        <option value="Work in Progress">Work in Progress</option>
+      </select>
+    </div>
+
+
+    <!-- Input Form -->
+    <form id="inventoryForm">
+      <input type="text" id="itemName" placeholder="Item Name" required />
+      <input type="number" id="quantity" placeholder="Quantity" required />
+      <input type="text" id="location" placeholder="Location" required />
+      <select id="category" required>
+        <option value="" disabled selected>Category</option>
+        <option value="Raw Material">Raw Material</option>
+        <option value="Finished Goods">Finished Goods</option>
+        <option value="Work in Progress">Work in Progress</option>
+      </select>
+      <button type="submit">Add Inventory</button>
+    </form>
+
+    <!-- Inventory Table -->
+    <table class="inventoryTable">
+      <thead>
+        <tr>
+          <th>Sr No</th>
+          <th>Item Name</th>
+          <th>Category</th>
+          <th>Quantity</th>
+          <th>Location</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="inventoryBody"></tbody>
+    </table>
+
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+  import { db } from './firebase-init.js';
+  import {
+    collection,
+    addDoc,
+    getDocs,
+    Timestamp
+  } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+
+  // -----------------------------
+  // STORE EMPLOYEES
+  // -----------------------------
+  const tableBody = document.getElementById('storeDepartmentTable');
+
+  async function loadStoreEmployees() {
+    const querySnapshot = await getDocs(collection(db, "employees"));
+    let srNo = 1;
+
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.department === "Store") {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${srNo++}</td>
+          <td>${data.name || '-'}</td>
+          <td>${data.empId || '-'}</td>
+          <td>${data.contact || '-'}</td>
+        `;
+
+        tableBody.appendChild(row);
+      }
+    });
+  }
+
+  loadStoreEmployees();
+
+  // -----------------------------
+  // INVENTORY WITH SUBCOLLECTIONS BY CATEGORY
+  // -----------------------------
+  const inventoryForm = document.getElementById("inventoryForm");
+  const inventoryTable = document.getElementById("inventoryBody");
+  const categoryFilter = document.getElementById("categoryFilter");
+
+  // ➤ Add Item to Subcollection (category/items)
+  inventoryForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("itemName").value;
+    const qty = parseInt(document.getElementById("quantity").value);
+    const location = document.getElementById("location").value;
+    const category = document.getElementById("category").value;
+
+    // Category doc → items subcollection
+    const categoryRef = collection(db, "store_inventory", category, "items");
+
+    await addDoc(categoryRef, {
+      name,
+      quantity: qty,
+      location,
+      category,
+      date: Timestamp.now()
+    });
+
+    inventoryForm.reset();
+    loadInventory(); // Refresh
+  });
+
+  // ➤ Load Inventory from Subcollections
+  async function loadInventory(filter = "All") {
+    inventoryTable.innerHTML = "";
+    let srNo = 1;
+
+    const categories = ["Raw Material", "Finished Goods", "Work in Progress"];
+
+    for (const cat of categories) {
+
+      // If filter is selected category → skip others
+      if (filter !== "All" && filter !== cat) continue;
+
+      const itemsRef = collection(db, "store_inventory", cat, "items");
+      const snapshot = await getDocs(itemsRef);
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const date = data.date?.toDate().toLocaleDateString() || "-";
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${srNo++}</td>
+          <td>${data.name}</td>
+          <td>${data.category}</td>
+          <td>${data.quantity}</td>
+          <td>${data.location}</td>
+          <td>${date}</td>
+        `;
+        inventoryTable.appendChild(row);
+      });
+    }
+  }
+
+  loadInventory();
+
+  // Category Filter Handler
+  categoryFilter.addEventListener("change", () => {
+    const selected = categoryFilter.value;
+    loadInventory(selected);
+  });
+</script>
+</body>
+
+</html>

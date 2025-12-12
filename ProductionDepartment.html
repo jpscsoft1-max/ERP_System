@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Production Department</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 60%;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    #assignWorkForm {
+      background-color: #fff;
+      padding: 20px;
+      width: 100%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    #assignWorkForm input[type="text"],
+    #assignWorkForm input[type="date"] {
+      width: 45%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #assignWorkForm select {
+      width: 45%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #assignWorkForm button {
+      padding: 10px 20px;
+      background-color: #1abc9c;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+
+    #assignWorkForm button:hover {
+      background-color: #25ddb8;
+    }
+
+    #techCheckboxes {
+      padding: 10px;
+      width: 20%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+
+    #assignedWorkTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  margin-top: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 10px;
+  overflow: hidden; /* smooth rounded corners */
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 15px;
+}
+
+/* HEADER */
+#assignedWorkTable th {
+  background-color: #1abc9c;   /* modern green header */
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  padding: 14px;
+  border: none;  /* remove old border */
+}
+
+/* BODY CELLS */
+#assignedWorkTable td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* ROW HOVER EFFECT */
+#assignedWorkTable tr:hover {
+  background-color: #f5fffd; /* soft mint hover */
+}
+
+/* DELETE BUTTON */
+#assignedWorkTable button {
+  padding: 6px 14px;
+  background-color: #e74c3c; /* modern red */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+#assignedWorkTable button:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+}
+
+  </style>
+
+
+  <script src="js/login-check.js"></script>
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon" onclick="toggleNotification()">🔔</span>
+        <span class="profile-icon" onclick="toggleProfileDropdown()">👤 Admin</span>
+      </div>
+      <div id="notificationDropdown" class="dropdown-menu" style="display: none;">
+        <a href="#">No new notifications</a>
+      </div>
+      <div id="profileDropdown" class="dropdown-menu" style="display: none;">
+        <a href="#">Profile</a>
+        <a href="login.html">Logout</a>
+      </div>
+    </div>
+  </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Production Department</h1>
+    <h2> No. of Productions:</h2>
+
+    <div class="table-container">
+      <table id="productionEmployeeTable">
+        <thead>
+          <tr>
+            <th>Sr No</th>
+            <th>Name</th>
+            <th>Emp ID</th>
+            <th>Mob No</th>
+          </tr>
+        </thead>
+        <tbody id="productionEmployeeBody">
+          <!-- Employee rows will be inserted here via JS -->
+        </tbody>
+      </table>
+    </div>
+    <hr> <br>
+    <h2>Assign Work:</h2>
+    <form id="assignWorkForm">
+      <label>Order Title:</label><br>
+      <input type="text" id="orderTitle" required><br><br>
+
+      <label>Start Date:</label><br>
+      <input type="date" id="startDate" required><br><br>
+
+      <label>Due Date:</label><br>
+      <input type="date" id="dueDate" required><br><br>
+
+      <label>Status:</label><br>
+      <select id="status" required>
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select><br><br>
+
+      <label>Supervisor / Manager Name:</label><br>
+      <input type="text" id="supervisor" required><br><br>
+
+      <label>Assign To (Select Employees):</label><br>
+      <div id="techCheckboxes"></div><br>
+
+      <button type="submit">Assign</button>
+    </form>
+    <h2>Assigned Work List:</h2>
+    <table id="assignedWorkTable">
+      <thead>
+        <tr>
+          <th>Sr No</th>
+          <th>Order Title</th>
+          <th>Start Date</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Supervisor</th>
+          <th>Assigned To</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+  </div>
+
+  <!-- firesbase Scripts -->
+  <script type="module">
+    import { db } from './firebase-init.js';
+    import {
+      collection,
+      getDocs,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const employeeTableBody = document.getElementById("productionEmployeeBody");
+    employeeTableBody.innerHTML = ""; // Clear existing rows
+    const heading = document.querySelector("h2");
+    const techCheckboxes = document.getElementById("techCheckboxes");
+    const assignedWorkTable = document.querySelector("#assignedWorkTable tbody");
+    const assignWorkForm = document.getElementById("assignWorkForm");
+
+
+    async function fetchProductionEmployees() {
+      const querySnapshot = await getDocs(collection(db, "employees"));
+      let srNo = 1;
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.department && data.department.toLowerCase() === "production") {
+          // Add to table
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${srNo}</td>
+          <td>${data.name || ''}</td>
+          <td>${data.empId || ''}</td>
+          <td>${data.contact || ''}</td>
+        `;
+          employeeTableBody.appendChild(tr);
+
+          // Add to checkbox section
+          const checkbox = document.createElement("div");
+          checkbox.innerHTML = `
+          <label>
+            <input type="checkbox" value="${data.name || ''}"> ${data.name || ''}
+          </label>`;
+          techCheckboxes.appendChild(checkbox);
+
+          srNo++;
+        }
+      });
+
+    }
+
+    async function fetchAssignedWork() {
+      const querySnapshot = await getDocs(collection(db, "assignedWork"));
+      let srNo = 1;
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+      <td>${srNo}</td>
+      <td>${data.orderTitle || ''}</td>
+      <td>${data.startDate || ''}</td>
+      <td>${data.dueDate || ''}</td>
+      <td>${data.status || ''}</td>
+      <td>${data.supervisor || ''}</td>
+      <td>${(data.assignedTo || []).join(", ")}</td>
+      <td><button onclick="this.closest('tr').remove()">Delete</button></td>
+    `;
+        assignedWorkTable.appendChild(row);
+        srNo++;
+      });
+    }
+
+    fetchProductionEmployees();
+    fetchAssignedWork();
+
+    assignWorkForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const orderTitle = document.getElementById("orderTitle").value;
+      const startDate = document.getElementById("startDate").value;
+      const dueDate = document.getElementById("dueDate").value;
+      const status = document.getElementById("status").value;
+      const supervisor = document.getElementById("supervisor").value;
+
+      const assignedTo = Array.from(techCheckboxes.querySelectorAll("input[type=checkbox]:checked"))
+        .map(cb => cb.value);
+
+      if (assignedTo.length === 0) {
+        alert("Please select at least one employee to assign.");
+        return;
+      }
+
+      const workData = {
+        orderTitle,
+        startDate,
+        dueDate,
+        status,
+        supervisor,
+        assignedTo
+      };
+
+      // Add to Firestore
+      try {
+        await addDoc(collection(db, "assignedWork"), workData);
+
+        // Add to Table UI
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${assignedWorkTable.rows.length + 1}</td>
+        <td>${orderTitle}</td>
+        <td>${startDate}</td>
+        <td>${dueDate}</td>
+        <td>${status}</td>
+        <td>${supervisor}</td>
+        <td>${assignedTo.join(", ")}</td>
+        <td><button onclick="this.closest('tr').remove()">Delete</button></td>
+      `;
+        assignedWorkTable.appendChild(row);
+
+        assignWorkForm.reset();
+        techCheckboxes.querySelectorAll("input").forEach(cb => cb.checked = false);
+      } catch (err) {
+        console.error("Error adding work:", err);
+        alert("Failed to assign work. Try again.");
+      }
+    });
+  </script>
+
+  <!-- JS Scripts -->
+  <script>
+    function goBack() {
+      window.history.back(); // Go to previous page
+    }
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+    function toggleNotification() {
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const profileDropdown = document.getElementById('profileDropdown');
+      profileDropdown.style.display = 'none';
+      notificationDropdown.style.display = (notificationDropdown.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function toggleProfileDropdown() {
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const profileDropdown = document.getElementById('profileDropdown');
+      notificationDropdown.style.display = 'none';
+      profileDropdown.style.display = (profileDropdown.style.display === 'block') ? 'none' : 'block';
+    }
+
+    document.addEventListener('click', function (event) {
+      const notificationIcon = document.querySelector('.notification-icon');
+      const profileIcon = document.querySelector('.profile-icon');
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const profileDropdown = document.getElementById('profileDropdown');
+
+      if (!notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
+        notificationDropdown.style.display = 'none';
+      }
+
+      if (!profileIcon.contains(event.target) && !profileDropdown.contains(event.target)) {
+        profileDropdown.style.display = 'none';
+      }
+    });
+
+    // Active Link Highlight
+    const currentPage = window.location.pathname.split("/").pop();
+    const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
+
+    sidebarLinks.forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+  </script>
+  <script src="js/rolepermission.js"></script>
+</body>
+
+</html>

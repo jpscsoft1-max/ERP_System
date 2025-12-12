@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Generate Login</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script> 
+  // Placed in <head> to prevent page from loading unauthorized content      
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon">🔔</span>
+        <span class="profile-icon">👤 Admin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Generate Login Details</h1>
+
+    <form id="loginForm" onsubmit="onHandle(event)" class="login-form">
+      <label>Username:</label>
+      <input type="text" id="username" required placeholder="Name@role">
+
+      <label>Password:</label>
+      <input type="password" id="password" required placeholder="Password">
+
+      <label>Role:</label>
+      <select id="role" required>
+        <option value="">-- Assign Role --</option>
+        <option>Admin</option>
+        <option>HR</option>
+        <option>Technical</option>
+        <option>Production</option>
+        <option>Sales</option>
+        <option>Store</option>
+      </select>
+
+      <button type="submit">Add</button>
+    </form>
+
+    <hr style="margin-top: 40px;">
+    <h2 style="text-align: center;">Existing Users</h2>
+    <table id="userTable" class="user-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Password</th>
+          <th>Role</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <hr style="margin-top: 40px;">
+    <h2 style="text-align: center;">Deleted Users</h2>
+    <table id="deletedUserTable" class="user-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Password</th>
+          <th>Role</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Firebase & Firestore Logic -->
+  <script type="module">
+    // 🔗 Import Firestore & DB
+    import { db } from './firebase-init.js';
+    import {
+      collection, addDoc, deleteDoc, doc, getDocs
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const usersCollection = collection(db, "users");
+
+    // 🧹 Firestore soft-delete function: backup user to "deleted_users" before deleting
+    async function backupAndDeleteUser(userData) {
+      try {
+        await addDoc(collection(db, "deleted_users"), {
+          ...userData,
+          deletedAt: new Date().toISOString()
+        });
+      } catch (e) {
+        console.error("Error in soft delete (backup):", e);
+      }
+    }
+
+    // ➕ Handle form submit: add new user
+    async function onHandle(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const role = document.getElementById('role').value;
+
+      if (!username.includes('@')) {
+        alert("Username must include '@' symbol.");
+        return;
+      }
+
+      // 🔁 Check if username already exists
+      const snapshot = await getDocs(usersCollection);
+      const duplicate = snapshot.docs.some(doc => doc.data().username === username);
+      if (duplicate) {
+        alert("Username already exists!");
+        return;
+      }
+
+      // ✅ Add to Firestore
+      try {
+        await addDoc(usersCollection, { username, password, role });
+        alert("User added successfully!");
+        loadUsers(); // refresh table
+        document.getElementById('loginForm').reset(); // clear form
+      } catch (error) {
+        console.error("Error adding user:", error);
+        alert("Failed to add user.");
+      }
+    }
+
+    // 📥 Load all users and populate table
+    async function loadUsers() {
+      const tbody = document.querySelector("#userTable tbody");
+      tbody.innerHTML = "";
+
+      const snapshot = await getDocs(usersCollection);
+      snapshot.forEach((docSnap) => {
+        const user = docSnap.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${user.username}</td>
+        <td>${user.password}</td>
+        <td>${user.role}</td>
+        <td><button class="delete-btn" onclick="deleteUser('${docSnap.id}', '${user.username}', '${user.password}', '${user.role}')">Delete</button> </td>
+      `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // ❌ Delete user from Firestore + backup before delete
+    window.deleteUser = async (id, username, password, role) => {
+      const confirmDelete = confirm(`Are you sure you want to delete "${username}"?`);
+      if (!confirmDelete) return;
+
+      try {
+        await backupAndDeleteUser({ username, password, role }); // backup
+        await deleteDoc(doc(db, "users", id)); // delete
+        alert("User deleted and backed up!");
+        loadUsers(); // refresh table
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        alert("Failed to delete user.");
+      }
+    };
+
+    // 🧭 Highlight current sidebar page on load
+    window.onload = () => {
+      const currentPage = window.location.pathname.split("/").pop();
+      document.querySelectorAll(".sidebar ul li a").forEach(link => {
+        if (link.getAttribute("href") === currentPage) {
+          link.classList.add("active");
+        }
+      });
+      loadUsers();           // main user table
+      loadDeletedUsers();    // deleted user table
+    };
+
+    // 🔁 Assign form handler globally
+    window.onHandle = onHandle;
+
+    // 🔙 Navigation helper functions
+    window.goBack = () => window.history.back();
+    window.goHome = () => window.location.href = 'index.html';
+
+    // 📂 Load deleted users into backup table
+    async function loadDeletedUsers() {
+      const tbody = document.querySelector("#deletedUserTable tbody");
+      tbody.innerHTML = "";
+
+      const snapshot = await getDocs(collection(db, "deleted_users"));
+      snapshot.forEach((docSnap) => {
+        const user = docSnap.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+  <td>${user.username}</td>
+  <td>${user.password}</td>
+  <td>${user.role}</td>
+  <td>
+    <button class="restore-btn" onclick="restoreUser('${docSnap.id}', '${user.username}', '${user.password}', '${user.role}')">Restore</button>
+    <button class="delete-btn" onclick="permanentDelete('${docSnap.id}', '${user.username}')">Delete</button>
+    </td>
+    `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // 🔁 Move deleted user back to "users" and remove from "deleted_users"
+    window.restoreUser = async (id, username, password, role) => {
+      try {
+        // Add back to "users"
+        await addDoc(collection(db, "users"), { username, password, role });
+
+        // Delete from "deleted_users"
+        await deleteDoc(doc(db, "deleted_users", id));
+
+        alert("User restored!");
+        loadUsers();
+        loadDeletedUsers();
+      } catch (e) {
+        console.error("Restore failed:", e);
+        alert("Error while restoring user.");
+      }
+    };
+    // 🗑 Permanently remove from deleted_users (no coming back)
+    window.permanentDelete = async (id, username) => {
+      const ok = confirm(`Permanently delete "${username}"?  This cannot be undone.`);
+      if (!ok) return;
+
+      try {
+        await deleteDoc(doc(db, "deleted_users", id));
+        alert("🗑️ User permanently deleted.");
+        loadDeletedUsers();       // refresh the Deleted‑users table
+      } catch (err) {
+        console.error("Permanent delete failed:", err);
+        alert("❌ Could not delete permanently.");
+      }
+    };
+
+  </script>
+  <script src="js/rolepermission.js"></script>
+</body>
+
+</html>

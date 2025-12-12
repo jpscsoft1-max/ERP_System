@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Quotation</title>
+  <style>
+    /* Page background */
+    body {
+      margin: 0;
+      background: #d1caca;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px;
+    }
+
+    /* A4 sheet styling */
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      padding: 3mm 4mm 6mm 10mm;
+      /* top, right, bottom, left */
+      box-sizing: border-box;
+    }
+
+    header img,
+    footer img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .quotation-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .info-block {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 12px;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #333;
+    }
+
+    th,
+    td {
+      padding: 6px;
+      text-align: left;
+    }
+
+    .terms,
+    .bank-details {
+      margin-top: 20px;
+      font-size: 12px;
+    }
+
+    .right-align {
+      text-align: right;
+    }
+
+    .print-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+      border-radius: 20px;
+    }
+
+    /* Quotation number title */
+    .quotation-title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 12px 0 10px;
+      border: 1px solid #000;
+      padding: 4px;
+    }
+
+    /* Table for customer + quotation info */
+    .quote-info {
+      width: 100%;
+      font-size: 13px;
+      border: 1px solid #000;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    .quote-info td {
+      border: 1px solid #000;
+      padding: 6px 8px;
+      vertical-align: top;
+    }
+
+    /* Header box table */
+    .quote-header {
+      width: 100%;
+      border: 2px solid black;
+      border-collapse: collapse;
+      margin: 10px 0 20px;
+      font-size: 13px;
+      margin-bottom: 0;
+    }
+
+    .quote-header td {
+      border: none;
+      padding: 6px 8px;
+      vertical-align: top;
+    }
+
+    .quote-header .title-cell {
+      border: 2px solid #000;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 2px 0;
+    }
+
+    .quote-header .left-cell,
+    .quote-header .right-cell {
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+    }
+
+    .quote-header .left-cell {
+      border-right: 1px solid #000;
+      width: 40%;
+    }
+
+    .quote-header .right-cell {
+      width: 60%;
+    }
+
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+      }
+
+      .sheet {
+        box-shadow: none;
+        margin: 0;
+      }
+
+      .print-btn,
+      button {
+        display: none;
+      }
+    }
+
+    .bottom-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid #000;
+      font-size: 12px;
+      margin-top: 0;
+      table-layout: fixed;
+      height: 220px;
+      /* adjust as needed */
+      margin-bottom: 5mm;
+    }
+
+    .bottom-table td {
+      border: 2px solid #000;
+      padding: 10px 12px;
+      vertical-align: top;
+      position: relative;
+    }
+
+    .bottom-table .left-cell {
+      width: 65%;
+      padding: 0mm;
+    }
+
+    .bottom-table .right-cell {
+      width: 35%;
+      padding: 12px;
+      vertical-align: top;
+      border-left: 2px solid #000;
+    }
+
+    signature-box {
+      border: 1px solid #000;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .signature-header {
+      text-align: left;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .stamp-box {
+      border: 1px dashed #999;
+      height: 60px;
+      width: 100%;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+      color: #777;
+      font-size: 12px;
+    }
+
+    .signature-footer {
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .signature-footer strong {
+      font-size: 14px;
+    }
+
+    .stamp-image-container {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .stamp-image-container img {
+      max-width: 130px;
+      height: auto;
+      opacity: 0.9;
+    }
+
+    .items-grid {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      border: 2px solid #000;
+      height: 330px;  /* adjust as needed */
+      box-sizing: border-box;
+      margin-top: 1px;
+      font-size: 12px;
+    }
+
+    .items-row {
+      display: grid;
+      grid-template-columns: 6% 60% 10% 12% 12%;
+      flex: 1;
+      border-top: none;
+      border-bottom: none;
+    }
+
+    .items-row>div {
+      border-right: 2px solid #000;
+      padding: 6px 10px;
+      overflow-wrap: break-word;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .items-row>div:last-child {
+      border-right: none;
+    }
+
+    .items-row.header {
+      font-weight: bold;
+      border-bottom: 2px solid #000;
+      
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sheet">
+    <header>
+      <img src="Company_header.png" alt="JPSCUBE ENGINEERS" style="color: rgb(28, 18, 117);" />
+    </header>
+
+    <table class="quote-header">
+      <tr>
+        <td colspan="2" class="title-cell">
+          <strong>QUOTATION No.:</strong> <span id="quotationNo"></span>
+        </td>
+      </tr>
+      <tr>
+        <td class="left-cell">
+          <strong>Kind Attn.:</strong> <span id="attnName">-</span><br><br>
+          <strong>M/S. <span id="customerName">-</span></strong><br>
+          <span id="customerAddress">-</span><br>
+          <b style="font-family:Arial, Helvetica, sans-serif;">GSTIN:</b> <span id="customerGST">-</span>
+        </td>
+        <td class="right-cell">
+          <strong>Date:</strong> <span id="quotationDate">-</span><br><br>
+          <strong>Buyer’s Reference & Date:</strong><br>
+          Reference Details
+        </td>
+      </tr>
+    </table>
+
+    <div class="items-grid" id="itemsGrid">
+      <div class="items-row header">
+        <div>Sr. No.</div>
+        <div>Particular</div>
+        <div>Quantity</div>
+        <div>Rate/Each</div>
+        <div>Total Amt.</div>
+      </div>
+      <!-- JS will fill 1–5 rows below -->
+    </div>
+
+
+    <p class="right-align" style="margin-top: 10px;">
+      <strong>Grand Total: ₹ <span id="grandTotal">0.00</span></strong>
+    </p>
+    <p style="color: red; font-size: small;"><b>** GST extra (18%) as applicable.</b></p>
+    <p style="color: red; font-size: small;"><b>** Freight Charges will be charged extra at actual.</b></p>
+    <table class="bottom-table">
+      <tr>
+        <td class="left-cell">
+
+          <p><b>** Validity:</b> Quotation valid for 1 week.</p>
+          <p><b>** Delivery Period:</b> 10-15 Days after getting PO with advance.</p>
+          <p><b>** Payment:</b> 50% Advance & 50% Against Delivery.</p>
+          <p style="color: red; font-size: small;"><b>**GST extra as applicable.</b></p>
+
+
+          <p><b>Company:JPSCUBE ENGINEERS</p>
+          <p>Registration No. B-26/53821</p>
+          <p>PAN NO: IRBPS8532P</p>
+          <p>GSTIN: 24IRBPS8532P1ZZ </b></p>
+
+          <p><strong>Bank Details:</strong> <b>A/C No.: 3692192511</p>
+          <div style="padding-left: 20mm;">
+            <p>Central Bank of India</p>
+            <p> Kareli Baug, Baroda</p>
+            <p>IFSC: CBIN0280486 | MICR: 390016007</p>
+            <p>Branch Code : 280486</p>
+          </div>
+        </td>
+
+        <td class="right-cell" style="position: relative; padding: 0;">
+          <div class="stamp-image-container" style="text-align: center; padding: 40px 8px 0px 0px;">
+            <img src="jpsc_stamp.png" alt="Company Stamp" style="max-width: 240px; opacity: 0.9;" />
+          </div>
+
+          <div class="signature-box"
+            style="position: absolute; bottom: 10px; left: 10px; right: 10px; border: 1px solid #000; padding: 10px; box-sizing: border-box;">
+            <div class="signature-header" style="text-align: left; font-size: 12px; margin-bottom: 8px;">
+              <span><b>Signature & Date :</b></span><br>
+              <span>For, JPSCUBE Engineers</span>
+            </div>
+            <div class="stamp-box"
+              style="border: 1px dashed #999; height: 60px; width: 100%; margin: 10px 0; display: flex; align-items: center; justify-content: center; font-style: italic; color: #777; font-size: 12px;">
+              Photo of Signature
+            </div>
+            <div class="signature-footer" style="font-size: 12px; text-align: center;">
+              <strong style="font-size: 14px;">Shalin Sapra</strong><br>(Proprietor)
+            </div>
+          </div>
+        </td>
+
+      </tr>
+    </table>
+
+    <footer>
+      <img src="Company_footer.png" alt="| CONTACT - +91 98243 19546 | MAIL - connect.jpsc@gmail.com | QUOTATION" />
+    </footer>
+  </div>
+
+  </div> <!-- this closes .sheet -->
+
+  <button onclick="window.print()" class="print-btn">🖨️ Print / Save as PDF</button>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem("currentQuote") || "{}");
+
+    if (data.customerName) {
+      document.getElementById("quotationNo").textContent = data.quotationNo || "-";
+      document.getElementById("quotationDate").textContent = data.quotationDate || "-";
+      document.getElementById("customerName").textContent = data.customerName || "-";
+      document.getElementById("customerAddress").textContent = data.address || "-";
+      document.getElementById("customerGST").textContent = data.gst || "-";
+      document.getElementById("attnName").textContent = data.customerName || "-";
+
+      const grandTotal = data.items?.reduce((acc, item) => {
+        const amount = parseFloat(item.total?.replace(/[₹,]/g, "")) || 0;
+        return acc + amount;
+      }, 0);
+      document.getElementById("grandTotal").textContent = grandTotal.toLocaleString("en-IN");
+
+      const grid = document.getElementById("itemsGrid");
+
+      const maxRows = 5;
+      const items = data.items || [];
+
+      for (let i = 0; i < maxRows; i++) {
+        const item = items[i] || {};
+        const row = document.createElement("div");
+        row.classList.add("items-row");
+
+        row.innerHTML = `
+        <div>${i < items.length ? i + 1 : ""}</div>
+        <div>${i < items.length ? `<strong>${item.desc}</strong><br>${item.details || ""}` : ""}</div>
+        <div>${i < items.length ? item.qty || "" : ""}</div>
+        <div>${i < items.length ? item.rate || "" : ""}</div>
+        <div>${i < items.length ? item.total || "" : ""}</div>
+      `;
+
+        grid.appendChild(row);
+      }
+    }
+  </script>
+
+</body>
+
+</html>

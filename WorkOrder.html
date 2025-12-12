@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Work Order</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script type="module" src="firebase-init.js"></script>
+
+  <script>
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <style>
+    .search-input {
+      width: 40%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+    }
+
+   /* Modern Order Table */
+/* Modern Order Table */
+.order-table {
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 15px;
+  text-align: center;   /* ✅ Center text for whole table */
+}
+
+/* Header */
+.order-table thead th {
+  background-color: #1abc9c;
+  color: white;
+  font-weight: 600;
+  padding: 12px 14px;
+  border-right: 1px solid #d1d1d1;
+  cursor: pointer;
+  text-align: center;  /* ensure header aligns */
+}
+
+.order-table thead th:last-child {
+  border-right: none;
+}
+
+/* Body */
+.order-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6e6e6;
+  border-right: 1px solid #e6e6e6;
+  text-align: center;  /* ensure cells align */
+}
+
+.order-table td:last-child {
+  border-right: none;
+}
+
+/* Row Hover */
+.order-table tbody tr:hover {
+  background-color: #f8fdfc;
+}
+
+/* Status badges */
+.badge {
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Buttons container */
+.order-actions {
+  display: flex;                /* ✅ Makes them sit side by side */
+  justify-content: center;      /* Center horizontally */
+  align-items: center;          /* Align vertically */
+  gap: 8px;                     /* space between buttons */
+}
+
+/* Action buttons */
+.order-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s ease;
+  width: 70px;                 /* consistent size */
+}
+
+/* Edit */
+.order-actions button:nth-child(1) {
+  background: #2980b9;
+  color: white;
+}
+
+.order-actions button:nth-child(1):hover {
+  background: #1f6c9d;
+}
+
+/* Delete */
+.order-actions button:nth-child(2) {
+  background: #c0392b;
+  color: white;
+}
+
+.order-actions button:nth-child(2):hover {
+  background: #a82f23;
+}
+
+/* FIX: Status badge not showing */
+.badge {
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+}
+
+/* Individual badge colors with !important (so they don't get overridden) */
+.badge-pending {
+  background: #e67e22 !important;
+}
+
+.badge-finished {
+  background: #2ecc71 !important;
+}
+
+.badge-inprocess {
+  background: #3498db !important;
+}
+
+.badge-future {
+  background: #9b59b6 !important;
+}
+
+/* FIX: Prevent table row hover from hiding badge colors */
+.order-table tbody tr:hover .badge {
+  filter: brightness(1.05) !important;
+}
+
+
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP NAVIGATION -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon">🔔</span>
+        <span class="profile-icon">👤 Admin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <h1>Work Order</h1>
+
+    <select id="workOrderSelector" class="workorder-dropdown" onchange="handleWorkOrderChange(this.value)">
+      <option value="" selected disabled>-- Select Order Type --</option>
+      <option value="add">Add Order</option>
+      <option value="future">Future Orders</option>
+      <option value="pending">Pending Orders</option>
+      <option value="in-process">Orders In Process</option>
+      <option value="finished">Finished Orders</option>
+      <option value="All">All Orders</option>
+    </select>
+
+    <!-- ADD ORDER -->
+    <div id="add" class="order-section">
+      <h2>Add Order</h2>
+      <div class="add-order-card">
+        <form class="add-order-form" onsubmit="submitOrder(event)">
+          <label>Order Title:</label>
+          <input type="text" id="orderTitle" required />
+
+          <label>Department:</label>
+          <select id="department" required>
+            <option value="">-- Select Department --</option>
+            <option value="Production">Production</option>
+            <option value="Technical">Technical</option>
+            <option value="HR">HR</option>
+          </select>
+
+          <label>Order Description:</label>
+          <textarea id="orderDetails" required></textarea>
+
+          <label>Due Date:</label>
+          <input type="date" id="dueDate" required />
+
+          <button type="submit">Add Order</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- FUTURE -->
+    <div id="future" class="order-section">
+      <h2>Future Orders</h2>
+      <p>No future orders yet.</p>
+    </div>
+
+    <!-- PENDING -->
+    <div id="pending" class="order-section">
+      <h2>Pending Orders</h2>
+
+      <input type="text" id="pendingSearch" placeholder="Search pending orders..." class="search-input">
+
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('pending', 0)">Title</th>
+            <th onclick="sortTable('pending', 1)">Department</th>
+            <th onclick="sortTable('pending', 2)">Description</th>
+            <th onclick="sortTable('pending', 3)">Due Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pendingOrderList"></tbody>
+      </table>
+    </div>
+
+    <!-- IN PROCESS -->
+    <div id="in-process" class="order-section">
+      <h2>Orders In Process</h2>
+      <p>No orders in process.</p>
+    </div>
+
+    <!-- FINISHED -->
+    <div id="finished" class="order-section">
+      <h2>Finished Orders</h2>
+      <p>No finished orders available.</p>
+    </div>
+
+    <!-- ALL ORDERS -->
+    <div id="All" class="order-section">
+      <h2>All Orders</h2>
+
+      <input type="text" id="allSearch" placeholder="Search all orders..." class="search-input">
+
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('all', 0)">Title</th>
+            <th onclick="sortTable('all', 1)">Department</th>
+            <th onclick="sortTable('all', 2)">Description</th>
+            <th onclick="sortTable('all', 3)">Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="allOrderList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script type="module">
+
+    function goBack() { window.history.back(); }
+    function goHome() { window.location.href = 'index.html'; }
+
+    const currentPage = window.location.pathname.split("/").pop();
+    document.querySelectorAll(".sidebar a").forEach(link => {
+      if (link.getAttribute("href") === currentPage) link.classList.add("active");
+    });
+
+    import { db } from "./firebase-init.js";
+    import {
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      updateDoc,
+      orderBy,
+      query
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const ordersCollection = collection(db, "work_orders");
+
+    window.handleWorkOrderChange = function (value) {
+      document.querySelectorAll(".order-section").forEach(sec => sec.style.display = "none");
+      if (!value) return;
+
+      const section = document.getElementById(value);
+      if (section) section.style.display = "block";
+
+      if (value === "pending") renderOrders("pending", "pendingOrderList");
+      if (value === "All") renderOrders("all", "allOrderList");
+    };
+
+    /* ------------------ RENDER ORDERS ------------------ */
+    async function renderOrders(filter, containerId) {
+      const snapshot = await getDocs(query(ordersCollection, orderBy("createdAt", "desc")));
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(order => filter === "pending" ? order.status === "pending" : true);
+
+      orders.forEach(order => {
+        const [year, month, day] = order.dueDate.split("-");
+        const formattedDate = `${day}/${month}/${year}`;
+
+        let badge = "";
+        if (order.status === "pending") badge = `<span class="badge badge-pending">Pending</span>`;
+        if (order.status === "finished") badge = `<span class="badge badge-finished">Finished</span>`;
+        if (order.status === "in-process") badge = `<span class="badge badge-inprocess">In Process</span>`;
+        if (order.status === "future") badge = `<span class="badge badge-future">Future</span>`;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${order.title}</td>
+          <td>${order.department}</td>
+          <td>${order.description}</td>
+          <td>${formattedDate}</td>
+          ${containerId === "allOrderList" ? `<td>${badge}</td>` : ""}
+          <td class="order-actions">
+            <button onclick="editOrder('${order.id}')">Edit</button>
+            <button onclick="deleteOrder('${order.id}')">Delete</button>
+          </td>
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    /* ------------------ SEARCH FILTER ------------------ */
+    document.getElementById("pendingSearch").addEventListener("input", function () {
+      filterTable("pendingOrderList", this.value);
+    });
+
+    document.getElementById("allSearch").addEventListener("input", function () {
+      filterTable("allOrderList", this.value);
+    });
+
+    function filterTable(tbodyID, value) {
+      const rows = document.querySelectorAll(`#${tbodyID} tr`);
+      value = value.toLowerCase();
+
+      rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+      });
+    }
+
+    /* ------------------ SORTING FUNCTION ------------------ */
+    let sortState = { pending: {}, all: {} };
+
+    window.sortTable = function (type, colIndex) {
+      const body = document.getElementById(type === "pending" ? "pendingOrderList" : "allOrderList");
+      let rows = Array.from(body.querySelectorAll("tr"));
+
+      sortState[type][colIndex] = !sortState[type][colIndex];
+      const asc = sortState[type][colIndex];
+
+      rows.sort((a, b) => {
+        const A = a.children[colIndex].innerText.toLowerCase();
+        const B = b.children[colIndex].innerText.toLowerCase();
+        return asc ? A.localeCompare(B) : B.localeCompare(A);
+      });
+
+      rows.forEach(row => body.appendChild(row));
+    };
+
+    /* ------------------ ADD ORDER ------------------ */
+    window.submitOrder = async function (event) {
+      event.preventDefault();
+
+      const title = document.getElementById("orderTitle").value.trim();
+      const department = document.getElementById("department").value;
+      const description = document.getElementById("orderDetails").value.trim();
+      const dueDate = document.getElementById("dueDate").value;
+      const editingId = document.getElementById("add").getAttribute("data-editing-id");
+
+      const order = {
+        title,
+        department,
+        description,
+        dueDate,
+        status: "pending",
+        createdAt: new Date().toISOString()
+      };
+
+      if (editingId) {
+        await updateDoc(doc(db, "work_orders", editingId), order);
+        alert("Order Updated!");
+      } else {
+        await addDoc(ordersCollection, order);
+        alert("Order Added!");
+      }
+
+      event.target.reset();
+      document.getElementById("add").removeAttribute("data-editing-id");
+      renderOrders("pending", "pendingOrderList");
+      renderOrders("all", "allOrderList");
+    };
+
+    /* ------------------ EDIT ORDER ------------------ */
+    window.editOrder = async function (id) {
+      const snapshot = await getDocs(ordersCollection);
+      const found = snapshot.docs.find(doc => doc.id === id);
+      if (!found) return;
+
+      const order = found.data();
+      document.getElementById("orderTitle").value = order.title;
+      document.getElementById("department").value = order.department;
+      document.getElementById("orderDetails").value = order.description;
+      document.getElementById("dueDate").value = order.dueDate;
+
+      document.getElementById("add").setAttribute("data-editing-id", id);
+      handleWorkOrderChange("add");
+    };
+
+    /* ------------------ DELETE ORDER ------------------ */
+    window.deleteOrder = async function (id) {
+      if (!confirm("Delete this order?")) return;
+      await deleteDoc(doc(db, "work_orders", id));
+      renderOrders("pending", "pendingOrderList");
+      renderOrders("all", "allOrderList");
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+      handleWorkOrderChange("");
+    });
+
+  </script>
+
+  <script src="js/rolepermission.js"></script>
+</body>
+
+</html>

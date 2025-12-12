@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Finance</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script> 
+  // Placed in <head> to prevent page from loading unauthorized content      
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon">🔔</span>
+        <span class="profile-icon">👤 Admin</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Finance</h1>
+    <p>Manage financial operations.</p>
+
+    <select id="financeSelector" class="purchase-dropdown" onchange="switchFinanceSection(this.value)">
+      <option value="" disabled selected>-- Select Finance Section --</option>
+      <option value="bankPay">Bank Pay Voucher</option>
+      <option value="bankReceipt">Bank Receipt Voucher</option>
+      <option value="cashPay">Cash Pay Voucher</option>
+      <option value="cashReceipt">Cash Receipt Voucher</option>
+      <option value="ledger">Ledger</option>
+      <option value="tds">TDS</option>
+      <option value="tcs">TCS</option>
+      <option value="gst">GST</option>
+    </select>
+
+    <!-- Finance Sections -->
+    <div id="bankPay" class="finance-section">
+      <h2>Bank Pay Voucher</h2>
+      <form onsubmit="saveFinanceData(event, 'bankPayData')">
+        <input type="text" placeholder="Payee Name" required />
+        <input type="number" placeholder="Amount" required />
+        <input type="date" required />
+        <textarea placeholder="Remarks"></textarea>
+        <button type="submit" class="save-btn">Save</button>
+      </form>
+      <ul id="bankPayList"></ul>
+    </div>
+
+    <div id="bankReceipt" class="finance-section">
+      <h2>Bank Receipt Voucher</h2>
+      <form onsubmit="saveFinanceData(event, 'bankReceiptData')">
+        <input type="text" placeholder="From" required />
+        <input type="number" placeholder="Amount" required />
+        <input type="date" required />
+        <textarea placeholder="Remarks"></textarea>
+        <button type="submit">Save</button>
+      </form>
+      <ul id="bankReceiptList"></ul>
+    </div>
+
+    <div id="cashPay" class="finance-section">
+      <h2>Cash Pay Voucher</h2>
+      <form onsubmit="saveFinanceData(event, 'cashPayData')">
+        <input type="text" placeholder="To" required />
+        <input type="number" placeholder="Amount" required />
+        <input type="date" required />
+        <textarea placeholder="Remarks"></textarea>
+        <button type="submit">Save</button>
+      </form>
+      <ul id="cashPayList"></ul>
+    </div>
+
+    <div id="cashReceipt" class="finance-section">
+      <h2>Cash Receipt Voucher</h2>
+      <form onsubmit="saveFinanceData(event, 'cashReceiptData')">
+        <input type="text" placeholder="From" required />
+        <input type="number" placeholder="Amount" required />
+        <input type="date" required />
+        <textarea placeholder="Remarks"></textarea>
+        <button type="submit">Save</button>
+      </form>
+      <ul id="cashReceiptList"></ul>
+    </div>
+
+    <div id="ledger" class="finance-section">
+      <h2>Ledger</h2>
+      <form onsubmit="saveLedger(event)">
+        <input type="date" required />
+        <input type="text" placeholder="Particulars" required />
+        <input type="text" placeholder="Voucher Type" required />
+        <input type="text" placeholder="Voucher No (Optional)" />
+        <div style="display: flex; gap: 15px; align-items: center;">
+          <label><input type="radio" name="type" value="debit" onchange="toggleAmountInput()" required /> Debit</label>
+          <label><input type="radio" name="type" value="credit" onchange="toggleAmountInput()" required />
+            Credit</label>
+        </div>
+        <input type="number" step="0.01" id="amountInput" placeholder="Amount (₹)" style="display: none;" required />
+        <button type="submit" class="add-btn">Add Entry</button>
+      </form>
+
+      <div style="margin: 15px 0; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+        <label>
+          Filter by Type:
+          <select id="typeFilter" onchange="applyLedgerFilters()">
+            <option value="">All</option>
+            <option value="Debit">Debit</option>
+            <option value="Credit">Credit</option>
+          </select>
+        </label>
+
+        <label>
+          Filter by Date:
+          <input type="date" id="dateFilter" onchange="applyLedgerFilters()" style="width: 170px; height: 36px;" />
+        </label>
+        <button class="edit-btn" type="button" onclick="clearDateFilter()" class="clear-btn-inline" style="
+    height: 24px;
+    padding: 0 6px;
+    font-size: 12px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    flex: 0 0 auto;
+  ">
+          ✕
+        </button>
+        <style>
+          .clear-btn-inline:hover {
+            background-color: #9f3024 !important;
+          }
+        </style>
+
+        <label style="flex: 1;">
+          Search:
+          <input type="text" id="ledgerSearch" oninput="applyLedgerFilters()" placeholder="Search Particulars..."
+            style="width: 20%;" />
+        </label>
+      </div>
+
+      <table class="ledger-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Particulars</th>
+            <th>Voucher Type</th>
+            <th>Voucher No</th>
+            <th>Type</th>
+            <th>Amount (₹)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerTableBody">
+          <!-- rows via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div id="tds" class="finance-section">
+      <h2>TDS (Tax Deducted at Source)</h2>
+      <p>Summary of TDS records will appear here.</p>
+    </div>
+
+    <div id="tcs" class="finance-section">
+      <h2>TCS (Tax Collected at Source)</h2>
+      <p>Summary of TCS records will appear here.</p>
+    </div>
+
+    <div id="gst" class="finance-section">
+      <h2>GST (Goods & Services Tax)</h2>
+      <p>GST returns and records summary will appear here.</p>
+    </div>
+  </div>
+
+  <script>
+    let ledgerEditIndex = null;
+    function goBack() {
+      window.history.back();
+    }
+
+    function goHome() {
+      window.location.href = "index.html";
+    }
+
+    const currentPage = window.location.pathname.split("/").pop();
+    document.querySelectorAll(".sidebar ul li a").forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+
+    function switchFinanceSection(sectionId) {
+      document.querySelectorAll(".finance-section").forEach(sec => sec.style.display = "none");
+      if (sectionId) {
+        document.getElementById(sectionId).style.display = "block";
+        renderList(sectionId + "List", sectionId + "Data");
+        if (sectionId === "ledger") renderLedgerTable();
+      }
+      if (sectionId === "ledger") {
+        document.getElementById("dateFilter").value = "";
+      }
+    }
+
+    let editIndex = null;
+    let currentStorageKey = "";
+
+    function saveFinanceData(event, storageKey) {
+      event.preventDefault();
+      const form = event.target;
+      const inputs = form.querySelectorAll("input, textarea");
+      const data = Array.from(inputs).map(input => input.value.trim());
+
+      let records = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+      if (editIndex !== null && currentStorageKey === storageKey) {
+        records[editIndex] = data;
+        editIndex = null;
+      } else {
+        records.push(data);
+      }
+
+      localStorage.setItem(storageKey, JSON.stringify(records));
+      inputs.forEach(input => input.value = "");
+      const listId = form.nextElementSibling.id;
+      renderList(listId, storageKey);
+    }
+
+    function renderList(listId, storageKey) {
+      const records = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      const ul = document.getElementById(listId);
+      ul.innerHTML = "";
+
+      if (records.length === 0) {
+        ul.innerHTML = "<li>No data available.</li>";
+        return;
+      }
+
+      records.forEach((entry, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span class="entry-text">${entry.join(" | ")}</span>
+          <div class="action-buttons">
+            <button onclick="editEntry('${storageKey}', ${index})">Edit</button>
+            <button class="delete-btn" onclick="deleteEntry('${storageKey}', ${index})">Delete</button>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    function editEntry(storageKey, index) {
+      const sectionId = storageKey.replace("Data", "");
+      const form = document.querySelector(`#${sectionId} form`);
+      const inputs = form.querySelectorAll("input, textarea");
+      const records = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      const data = records[index];
+      inputs.forEach((input, i) => input.value = data[i]);
+      editIndex = index;
+      currentStorageKey = storageKey;
+    }
+
+    function deleteEntry(storageKey, index) {
+      if (!confirm("Are you sure you want to delete this entry?")) return;
+      let records = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      records.splice(index, 1);
+      localStorage.setItem(storageKey, JSON.stringify(records));
+      const sectionId = storageKey.replace("Data", "");
+      renderList(sectionId + "List", storageKey);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      switchFinanceSection("");
+      renderLedgerTable();
+    });
+
+    function toggleAmountInput() {
+      document.getElementById("amountInput").style.display = "block";
+    }
+
+    function saveLedger(event) {
+      event.preventDefault();
+      const form = event.target;
+      const date = form.querySelector('input[type="date"]').value.trim();
+      const particulars = form.querySelector('input[placeholder="Particulars"]').value.trim();
+      const voucherType = form.querySelector('input[placeholder="Voucher Type"]').value.trim();
+      const voucherNo = form.querySelector('input[placeholder="Voucher No (Optional)"]').value.trim();
+      const amount = form.querySelector('#amountInput').value.trim();
+      const type = form.querySelector('input[name="type"]:checked')?.value;
+
+      let debit = "", credit = "";
+      if (type === "debit") debit = amount;
+      else if (type === "credit") credit = amount;
+
+      let ledger = JSON.parse(localStorage.getItem("ledgerData") || "[]");
+
+      const newEntry = [date, particulars, voucherType, voucherNo, debit, credit];
+
+      if (ledgerEditIndex !== null) {
+        ledger[ledgerEditIndex] = newEntry;
+        ledgerEditIndex = null; // reset
+      } else {
+        ledger.push(newEntry);
+      }
+
+      localStorage.setItem("ledgerData", JSON.stringify(ledger));
+
+      form.reset();
+      const amountInput = document.getElementById("amountInput");
+      amountInput.style.display = "none";
+      amountInput.value = "";
+
+      renderLedgerTable();
+    }
+
+    function renderLedgerTable(filterType = "", searchQuery = "", filterDate = "") {
+      const ledger = JSON.parse(localStorage.getItem("ledgerData") || "[]");
+      const tbody = document.getElementById("ledgerTableBody");
+      tbody.innerHTML = "";
+
+      const filtered = ledger.filter(entry => {
+        const [date, particulars, , , debit, credit] = entry;
+        const type = debit ? "Debit" : credit ? "Credit" : "";
+
+        const matchesType = !filterType || type === filterType;
+        const matchesSearch = !searchQuery || particulars.toLowerCase().includes(searchQuery);
+        const matchesDate = !filterDate || date === filterDate;
+
+        return matchesType && matchesSearch && matchesDate;
+      });
+
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='7'>No ledger entries found.</td></tr>";
+        return;
+      }
+
+      filtered.forEach((entry, index) => {
+        const [date, particulars, voucherType, voucherNo, debit, credit] = entry;
+        const type = debit ? "Debit" : credit ? "Credit" : "";
+        const amount = debit || credit;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${date}</td>
+          <td>${particulars}</td>
+          <td>${voucherType}</td>
+          <td>${voucherNo}</td>
+          <td>${type}</td>
+          <td>${amount}</td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <button class="edit-btn" onclick="editLedger(${index})">Edit</button>
+              <button class="delete-btn" onclick="deleteLedger(${index})">Delete</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function applyLedgerFilters() {
+      const type = document.getElementById("typeFilter").value;
+      const query = document.getElementById("ledgerSearch").value.trim().toLowerCase();
+      const date = document.getElementById("dateFilter").value;
+      renderLedgerTable(type, query, date);
+    }
+
+    function deleteLedger(index) {
+      if (!confirm("Are you sure you want to delete this ledger entry?")) return;
+      const ledger = JSON.parse(localStorage.getItem("ledgerData") || "[]");
+      ledger.splice(index, 1);
+      localStorage.setItem("ledgerData", JSON.stringify(ledger));
+      renderLedgerTable();
+    }
+
+    function editLedger(index) {
+      const ledger = JSON.parse(localStorage.getItem("ledgerData") || "[]");
+      const [date, particulars, voucherType, voucherNo, debit, credit] = ledger[index];
+
+      const form = document.querySelector("#ledger form");
+      form.querySelector('input[type="date"]').value = date;
+      form.querySelector('input[placeholder="Particulars"]').value = particulars;
+      form.querySelector('input[placeholder="Voucher Type"]').value = voucherType;
+      form.querySelector('input[placeholder="Voucher No (Optional)"]').value = voucherNo;
+
+      const amountInput = document.getElementById("amountInput");
+      if (debit) {
+        form.querySelector('input[value="debit"]').checked = true;
+        amountInput.value = debit;
+      } else if (credit) {
+        form.querySelector('input[value="credit"]').checked = true;
+        amountInput.value = credit;
+      }
+
+      amountInput.style.display = "block";
+      ledgerEditIndex = index; // 🔥 KEY LINE
+
+      // Don't delete entry here
+    }
+    function clearDateFilter() {
+      document.getElementById("dateFilter").value = "";
+      applyLedgerFilters();
+    }
+  </script>
+  <script src="js/rolepermission.js"></script>
+  <script src="js/common.js"></script>
+<script> checkLogin(); </script>
+
+</body>
+
+</html>

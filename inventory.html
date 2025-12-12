@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventory</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script> 
+  // Placed in <head> to prevent page from loading unauthorized content      
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon">🔔</span>
+        <span class="profile-icon">👤 Admin</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <h1>Inventory</h1>
+    <p>Manage inventory categories here.</p>
+
+    <select id="inventorySelector" class="purchase-dropdown" onchange="handleInventoryChange(this.value)">
+      <option value="" selected disabled>-- Select Inventory Type --</option>
+      <option value="raw">Raw Materials</option>
+      <option value="finished">Finished Goods</option>
+      <option value="semi">Semi-finished Goods</option>
+      <option value="all">All Materials</option>
+    </select>
+
+    <div id="raw" class="inventory-section">
+      <h2>Raw Materials</h2>
+      <form class="inventory-form" onsubmit="saveItem(event, 'rawMaterials')">
+        <input type="text" id="rawName" placeholder="Item Name" required />
+        <input type="number" id="rawQty" placeholder="Quantity" required />
+        <select id="rawUnit" required>
+          <option value="">-- Unit --</option>
+          <option value="kg">kg</option>
+          <option value="pcs">pcs</option>
+          <option value="litres">litres</option>
+          <option value="m²">m²</option>
+        </select>
+        <input type="text" id="rawLoc" placeholder="Location" required />
+        <button type="submit">Add Item</button>
+      </form>
+      <table id="rawTable"></table>
+    </div>
+
+    <div id="finished" class="inventory-section">
+      <h2>Finished Goods</h2>
+      <form class="inventory-form" onsubmit="saveItem(event, 'finishedGoods')">
+        <input type="text" id="finishedName" placeholder="Item Name" required />
+        <input type="number" id="finishedQty" placeholder="Quantity" required />
+        <select id="finishedUnit" required>
+          <option value="">-- Unit --</option>
+          <option value="kg">kg</option>
+          <option value="pcs">pcs</option>
+          <option value="litres">litres</option>
+          <option value="m²">m²</option>
+        </select>
+        <input type="text" id="finishedLoc" placeholder="Location" required />
+        <button type="submit">Add Item</button>
+      </form>
+      <table id="finishedTable"></table>
+    </div>
+
+    <div id="semi" class="inventory-section">
+      <h2>Semi-finished Goods</h2>
+      <form class="inventory-form" onsubmit="saveItem(event, 'semiFinishedGoods')">
+        <input type="text" id="semiName" placeholder="Item Name" required />
+        <input type="number" id="semiQty" placeholder="Quantity" required />
+        <select id="semiUnit" required>
+          <option value="">-- Unit --</option>
+          <option value="kg">kg</option>
+          <option value="pcs">pcs</option>
+          <option value="litres">litres</option>
+          <option value="m²">m²</option>
+        </select>
+        <input type="text" id="semiLoc" placeholder="Location" required />
+        <button type="submit">Add Item</button>
+      </form>
+      <table id="semiTable"></table>
+    </div>
+
+    <!-- ✅ ✅ ✅ Moved INSIDE .main-content -->
+    <div id="all" class="inventory-section">
+      <h2>All Materials</h2>
+      <div class="search-filter-wrapper">
+        <label for="searchType">Search By:</label>
+        <select id="searchType" onchange="searchAllMaterials()">
+          <option value="">-- Select Filter --</option>
+          <option value="category">Category</option>
+          <option value="name">Item Name</option>
+          <option value="loc">Location</option>
+        </select>
+
+        <input type="text" id="searchInput" placeholder="Enter search keyword..." oninput="searchAllMaterials()" />
+      </div>
+
+
+      <table id="allMaterialsTable" class="inventory-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+            <th>Location</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows inserted via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    const currentPage = window.location.pathname.split("/").pop();
+    const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
+    sidebarLinks.forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+
+    function handleInventoryChange(value) {
+      const sections = document.querySelectorAll(".inventory-section");
+      sections.forEach(section => section.style.display = "none");
+
+      if (value) {
+        document.getElementById(value).style.display = "block";
+
+        if (value === "raw") renderTable("raw");
+        if (value === "finished") renderTable("finished");
+        if (value === "semi") renderTable("semi");
+        if (value === "all") renderAllTable();
+      }
+    }
+
+    function saveItem(event, storageKey) {
+      event.preventDefault();
+
+      let name, qty, unit, loc, tableId, sectionId;
+      if (storageKey === "rawMaterials") {
+        name = document.getElementById("rawName").value;
+        qty = document.getElementById("rawQty").value;
+        unit = document.getElementById("rawUnit").value;
+        loc = document.getElementById("rawLoc").value;
+        tableId = "rawTable";
+        sectionId = "raw";
+      } else if (storageKey === "finishedGoods") {
+        name = document.getElementById("finishedName").value;
+        qty = document.getElementById("finishedQty").value;
+        unit = document.getElementById("finishedUnit").value;
+        loc = document.getElementById("finishedLoc").value;
+        tableId = "finishedTable";
+        sectionId = "finished";
+      } else if (storageKey === "semiFinishedGoods") {
+        name = document.getElementById("semiName").value;
+        qty = document.getElementById("semiQty").value;
+        unit = document.getElementById("semiUnit").value;
+        loc = document.getElementById("semiLoc").value;
+        tableId = "semiTable";
+        sectionId = "semi";
+      }
+
+      const items = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      items.push({ name, qty, unit, loc });
+      localStorage.setItem(storageKey, JSON.stringify(items));
+
+      alert("Item saved!");
+      event.target.reset();
+      renderTable(sectionId);
+    }
+
+    function renderTable(section) {
+      let storageKey, tableId;
+      if (section === "raw") {
+        storageKey = "rawMaterials";
+        tableId = "rawTable";
+      } else if (section === "finished") {
+        storageKey = "finishedGoods";
+        tableId = "finishedTable";
+      } else if (section === "semi") {
+        storageKey = "semiFinishedGoods";
+        tableId = "semiTable";
+      } else {
+        return;
+      }
+
+      const data = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      const table = document.getElementById(tableId);
+      if (data.length === 0) {
+        table.innerHTML = "<tr><td>No items found.</td></tr>";
+        return;
+      }
+
+      let rows = `
+        <tr>
+          <th>Item Name</th>
+          <th>Quantity</th>
+          <th>Unit</th>
+          <th>Location</th>
+          <th>Actions</th>
+        </tr>
+      `;
+      data.forEach((item, index) => {
+        rows += `
+    <tr>
+      <td>${item.name}</td>
+      <td>${item.qty}</td>
+      <td>${item.unit}</td>
+      <td>${item.loc}</td>
+      <td>
+        <button class="edit-btn" onclick="editSingleItem('${storageKey}', ${index}, '${section}')">Edit</button>
+        <button class="delete-btn" onclick="deleteSingleItem('${storageKey}', ${index}, '${section}')">Delete</button>
+      </td>
+    </tr>
+  `;
+      });
+      table.innerHTML = rows;
+    }
+
+    function renderAllTable() {
+      const table = document.getElementById("allMaterialsTable");
+      let allData = [];
+
+      const raw = JSON.parse(localStorage.getItem("rawMaterials") || "[]");
+      raw.forEach(item => allData.push({ ...item, category: "Raw Material" }));
+
+      const finished = JSON.parse(localStorage.getItem("finishedGoods") || "[]");
+      finished.forEach(item => allData.push({ ...item, category: "Finished Goods" }));
+
+      const semi = JSON.parse(localStorage.getItem("semiFinishedGoods") || "[]");
+      semi.forEach(item => allData.push({ ...item, category: "Semi-finished Goods" }));
+
+      if (allData.length === 0) {
+        table.innerHTML = "<tr><td>No materials found.</td></tr>";
+        return;
+      }
+
+      let rows = `
+        <tr>
+          <th>Category</th>
+          <th>Item Name</th>
+          <th>Quantity</th>
+          <th>Unit</th>
+          <th>Location</th>
+        </tr>
+      `;
+
+      allData.forEach((item, index) => {
+        rows += `
+          <tr>
+            <td>${item.category}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>${item.unit}</td>
+            <td>${item.loc}</td>
+            <td>
+        <button class="edit-btn" onclick="editItem('${item.category}', ${index})">Edit</button>
+        <button class="delete-btn" onclick="deleteItem('${item.category}', ${index})">Delete</button>
+      </td>
+          </tr>
+        `;
+      });
+
+      table.innerHTML = rows;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      handleInventoryChange("");
+    });
+    function getStorageKey(category) {
+      switch (category) {
+        case "Raw Material": return "rawMaterials";
+        case "Finished Goods": return "finishedGoods";
+        case "Semi-finished Goods": return "semiFinishedGoods";
+        default: return "";
+      }
+    }
+
+    function deleteItem(category, index) {
+      const key = getStorageKey(category);
+      if (!key) return;
+
+      const data = JSON.parse(localStorage.getItem(key) || "[]");
+      if (confirm("Delete this item?")) {
+        data.splice(index, 1);
+        localStorage.setItem(key, JSON.stringify(data));
+        renderAllTable();
+      }
+    }
+
+    function inlineEditItem(category, index) {
+      const key = getStorageKey(category);
+      const data = JSON.parse(localStorage.getItem(key) || "[]");
+      const item = data[index];
+
+      const tableBody = document.getElementById("allMaterialsTable").getElementsByTagName("tbody")[0];
+      const row = tableBody.rows[index];
+
+      row.innerHTML = `
+    <td>${category}</td>
+    <td><input value="${item.name}" id="editName${index}" /></td>
+    <td><input type="number" value="${item.qty}" id="editQty${index}" /></td>
+    <td><input value="${item.unit}" id="editUnit${index}" /></td>
+    <td><input value="${item.loc}" id="editLoc${index}" /></td>
+    <td>
+      <button onclick="saveInlineEdit('${category}', ${index})">Save</button>
+      <button onclick="renderAllTable()">Cancel</button>
+    </td>
+  `;
+    }
+
+    function saveInlineEdit(category, index) {
+      const key = getStorageKey(category);
+      const data = JSON.parse(localStorage.getItem(key) || "[]");
+
+      const name = document.getElementById(`editName${index}`).value;
+      const qty = document.getElementById(`editQty${index}`).value;
+      const unit = document.getElementById(`editUnit${index}`).value;
+      const loc = document.getElementById(`editLoc${index}`).value;
+
+      if (name && qty && unit && loc) {
+        data[index] = { name, qty, unit, loc };
+        localStorage.setItem(key, JSON.stringify(data));
+        renderAllTable();
+      } else {
+        alert("Please fill all fields.");
+      }
+    }
+
+    function deleteSingleItem(storageKey, index, sectionId) {
+      const data = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      if (confirm("Delete this item?")) {
+        data.splice(index, 1);
+        localStorage.setItem(storageKey, JSON.stringify(data));
+        renderTable(sectionId);
+      }
+    }
+
+    function editSingleItem(storageKey, index, sectionId) {
+      const data = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      const item = data[index];
+
+      const newName = prompt("Edit name:", item.name);
+      const newQty = prompt("Edit quantity:", item.qty);
+      const newUnit = prompt("Edit unit:", item.unit);
+      const newLoc = prompt("Edit location:", item.loc);
+
+      if (newName && newQty && newUnit && newLoc) {
+        data[index] = { name: newName, qty: newQty, unit: newUnit, loc: newLoc };
+        localStorage.setItem(storageKey, JSON.stringify(data));
+        renderTable(sectionId);
+      }
+    }
+    let allMaterialsCache = [];
+
+    function renderAllTable() {
+      const table = document.getElementById("allMaterialsTable").getElementsByTagName("tbody")[0];
+      allMaterialsCache = [];
+
+      const raw = JSON.parse(localStorage.getItem("rawMaterials") || "[]");
+      raw.forEach(item => allMaterialsCache.push({ ...item, category: "Raw Material" }));
+
+      const finished = JSON.parse(localStorage.getItem("finishedGoods") || "[]");
+      finished.forEach(item => allMaterialsCache.push({ ...item, category: "Finished Goods" }));
+
+      const semi = JSON.parse(localStorage.getItem("semiFinishedGoods") || "[]");
+      semi.forEach(item => allMaterialsCache.push({ ...item, category: "Semi-finished Goods" }));
+
+      updateAllTableRows(allMaterialsCache);
+    }
+
+    function updateAllTableRows(data) {
+      const tableBody = document.getElementById("allMaterialsTable").getElementsByTagName("tbody")[0];
+      tableBody.innerHTML = "";
+
+      data.forEach((item, index) => {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+      <td>${item.category}</td>
+      <td>${item.name}</td>
+      <td>${item.qty}</td>
+      <td>${item.unit}</td>
+      <td>${item.loc}</td>
+      <td>
+        <button class="edit-btn" onclick="inlineEditItem('${item.category}', ${index})">Edit</button>
+        <button class="delete-btn" onclick="deleteItem('${item.category}', ${index})">Delete</button>
+      </td>
+    `;
+      });
+    }
+
+    function searchAllMaterials() {
+      const filterType = document.getElementById("searchType").value;
+      const filterValue = document.getElementById("searchInput").value.toLowerCase();
+
+      if (!filterType || !filterValue) {
+        updateAllTableRows(allMaterialsCache);
+        return;
+      }
+
+      const filtered = allMaterialsCache.filter(item => {
+        const val = item[filterType]?.toLowerCase();
+        return val && val.includes(filterValue);
+      });
+
+      updateAllTableRows(filtered);
+    }
+    function toggleSearchFilters() {
+      const filterDiv = document.getElementById("searchOptions");
+      filterDiv.style.display = filterDiv.style.display === "flex" ? "none" : "flex";
+    }
+
+    function filterTable() {
+      const category = document.getElementById("filterCategory").value.toLowerCase();
+      const itemName = document.getElementById("filterItemName").value.toLowerCase();
+      const location = document.getElementById("filterLocation").value.toLowerCase();
+
+      const table = document.getElementById("allMaterialsTable");
+      const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+      for (let row of rows) {
+        const categoryCell = row.cells[0].textContent.toLowerCase();
+        const itemNameCell = row.cells[1].textContent.toLowerCase();
+        const locationCell = row.cells[4].textContent.toLowerCase();
+
+        const matches =
+          categoryCell.includes(category) &&
+          itemNameCell.includes(itemName) &&
+          locationCell.includes(location);
+
+        row.style.display = matches ? "" : "none";
+      }
+    }
+
+  </script>
+  <script src="js/rolepermission.js"></script>
+</body>
+
+</html>

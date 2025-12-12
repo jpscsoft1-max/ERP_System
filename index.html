@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP Dashboard</title>
+
+  <!-- CHANGE: Company favicons -->
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <link rel="icon" type="images/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="images/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+
+<link rel="stylesheet" href="css/styles.css" />
+
+<script>
+  // Placed in <head> to prevent page from loading unauthorized content      
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <!-- <span class="notification-icon">🔔</span> -->
+        <span class="notification-icon" id="notificationIcon">🔔</span>
+        <div class="notification-panel" id="notificationPanel">
+          <h4>Notifications</h4>
+          <ul id="notificationList">
+            <li>No new notifications</li>
+          </ul>
+        </div>
+        <span class="profile-icon">👤 Admin</span>
+        <!-- <button onclick="logout()" style="margin-left: 10px;">Logout</button> -->
+        <!-- Added styled Logout button to match JPSCUBE company theme -->
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <h1>Welcome</h1>
+    <img class="dash" src="dashex.png" alt="dashboard">
+  </div>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    const currentPage = window.location.pathname.split("/").pop();
+    const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
+
+    sidebarLinks.forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+
+    // 🔔 Notification icon click toggle
+    const notificationIcon = document.getElementById("notificationIcon");
+    const notificationPanel = document.getElementById("notificationPanel");
+
+    if (notificationIcon && notificationPanel) {
+      notificationIcon.addEventListener("click", () => {
+        notificationPanel.classList.toggle("show");
+      });
+
+      // Optional: hide the panel when clicking outside
+      document.addEventListener("click", (event) => {
+        // If the click is not on the bell or inside the panel, then hide it
+        if (
+          !notificationPanel.contains(event.target) &&
+          !notificationIcon.contains(event.target)
+        ) {
+          notificationPanel.classList.remove("show");
+        }
+      });
+      // ==================================================
+      // CHANGE: Hide notification panel only when user scrolls
+      // AFTER it is already open (prevents instant close on click)
+      // ==================================================
+
+      let lastScrollPosition = window.scrollY;
+
+      window.addEventListener("scroll", function () {
+        const notificationPanel = document.getElementById("notificationPanel");
+
+        if (!notificationPanel) return;
+
+        const currentScrollPosition = window.scrollY;
+
+        // Hide panel ONLY if page is actually scrolling
+        if (
+          notificationPanel.classList.contains("show") &&
+          Math.abs(currentScrollPosition - lastScrollPosition) > 5
+        ) {
+          notificationPanel.classList.remove("show");
+        }
+
+        lastScrollPosition = currentScrollPosition;
+      });
+
+
+    }
+
+    function logout() {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("userRole");
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <script src="js/rolepermission.js"></script>
+  <script src="js/notification.js"></script>
+
+
+</body>
+
+</html>

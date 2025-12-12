@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Department</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script>
+    // Placed in <head> to prevent page from loading unauthorized content      
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "login.html";
+    }
+  </script>
+  <style>
+    /* Section container this */
+    .hr-section {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    /* Header title */
+    .hr-section h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    /* Button styles */
+    .hr-btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 8px 16px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Table styles */
+    .hr-table {
+      width: 60%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      margin-top: 10px;
+    }
+
+    .hr-table th,
+    .hr-table td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    .hr-table th {
+      background-color: #f2f2f2;
+    }
+
+    /* Action buttons in table */
+    .hr-action-btn {
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+
+    .hr-action-btn.delete {
+      background-color: #f44336;
+    }
+
+    /* Input styling inside table */
+    .hr-table input[type="text"],
+    .hr-table input[type="email"],
+    .hr-table input[type="tel"] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .hr-table input:focus {
+      outline: none;
+      border-color: #2196F3;
+      background-color: #f9fcff;
+    }
+
+    /* Improve table spacing for cleaner rows */
+    .hr-table td,
+    .hr-table th {
+      vertical-align: middle;
+    }
+
+    /* Hover row effect */
+    .hr-table tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+
+      .hr-table th,
+      .hr-table td {
+        font-size: 13px;
+        padding: 8px;
+      }
+
+      .hr-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+      }
+
+      .hr-table input {
+        font-size: 13px;
+      }
+    }
+
+  
+
+    #leaveForm {
+      display: flex;
+      width: 97%;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+
+    .hr-add-btn {
+      background-color: #1abc9c;
+      color: white;
+      width: 10%;
+      height: 10mm;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .hr-add-btn:hover {
+      background-color: #15987e;
+    }
+
+    #leaveName,
+    #leaveType,
+    #leaveFrom,
+    #leaveTo {
+      width: 100%;
+      padding: 8px 10px;
+      margin: 5px 0 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    #leaveDays {
+      width: 70%;
+      padding: 8px 10px;
+      margin: 5px 0 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    #leaveDays[readonly] {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+    /* ==== FORCE FULL BORDERS FOR LEAVE TABLE ONLY ==== */
+.leave-table.modern-table {
+  border: 1px solid #ccc !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* Horizontal + Vertical borders */
+.leave-table.modern-table th,
+.leave-table.modern-table td {
+  border: 1px solid #ccc !important;
+}
+
+/* Fix last column right border */
+.leave-table.modern-table th:last-child,
+.leave-table.modern-table td:last-child {
+  border-right: 1px solid #ccc !important;
+}
+
+/* Keep header green */
+.leave-table.modern-table thead tr,
+.leave-table.modern-table thead th {
+  background-color: #1abc9c !important;
+  color: white !important;
+}
+
+  </style>
+
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon" onclick="toggleNotification()">🔔</span>
+        <span class="profile-icon" onclick="toggleProfileDropdown()">👤 Admin</span>
+      </div>
+      <div id="notificationDropdown" class="dropdown-menu" style="display: none;">
+        <a href="#">No new notifications</a>
+      </div>
+      <div id="profileDropdown" class="dropdown-menu" style="display: none;">
+        <a href="#">Profile</a>
+        <a href="login.html">Logout</a>
+      </div>
+    </div>
+  </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="hr-section">
+    <h1 style="margin-bottom: 20px; color: #2c3e50;">HR Department </h1>
+    <h2>No. of HRs</h2>
+    <!-- HR Employee Table -->
+    <table class="hr-table" style="margin-top: 20px;">
+      <thead>
+        <tr>
+          <th>Sr No</th>
+          <th>Name</th>
+          <th>Employee ID</th>
+          <th>Mobile No</th>
+        </tr>
+      </thead>
+      <tbody id="hrTableBody">
+        <!-- HR employees will be loaded here -->
+      </tbody>
+    </table> <br>
+    <hr> <br>
+
+    <h2>Leave Management</h2>
+
+    <!-- Leave Form -->
+    <form id="leaveForm" onsubmit="addLeave(event)">
+      <label>
+        Employee Name:
+        <input type="text" id="leaveName" required />
+      </label>
+      <label>
+        Leave Type:
+        <select id="leaveType" required>
+          <option value="">Select</option>
+          <option value="Sick">Sick</option>
+          <option value="Casual">Casual</option>
+          <option value="Earned">Paid</option>
+        </select>
+      </label>
+      <label>
+        From:
+        <input type="date" id="leaveFrom" required />
+      </label>
+      <label>
+        To:
+        <input type="date" id="leaveTo" required />
+      </label>
+      <label>
+        No. of Days:
+        <input type="text" id="leaveDays" readonly />
+      </label>
+
+      <button class="hr-add-btn" type="submit">Add Leave</button>
+    </form>
+
+    <!-- Leave Table -->
+    <table class="modern-table leave-table">
+     <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Type</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Days</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="leaveTableBody">
+        <!-- Leaves will be rendered here -->
+      </tbody>
+    </table>
+
+  </div>
+
+
+  <!-- JS Scripts -->
+ <script>
+    function goBack() { window.history.back(); }
+    function goHome() { window.location.href = 'index.html'; }
+
+    function toggleNotification() {
+      const n = document.getElementById('notificationDropdown');
+      const p = document.getElementById('profileDropdown');
+      p.style.display = 'none';
+      n.style.display = n.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleProfileDropdown() {
+      const n = document.getElementById('notificationDropdown');
+      const p = document.getElementById('profileDropdown');
+      n.style.display = 'none';
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.addEventListener('click', function (event) {
+      const ni = document.querySelector('.notification-icon');
+      const pi = document.querySelector('.profile-icon');
+      const nd = document.getElementById('notificationDropdown');
+      const pd = document.getElementById('profileDropdown');
+
+      if (!ni.contains(event.target) && !nd.contains(event.target)) nd.style.display = 'none';
+      if (!pi.contains(event.target) && !pd.contains(event.target)) pd.style.display = 'none';
+    });
+
+    const currentPage = window.location.pathname.split("/").pop();
+    document.querySelectorAll(".sidebar ul li a").forEach(link => {
+      if (link.getAttribute("href") === currentPage) link.classList.add("active");
+    });
+</script>
+
+
+<!-- ================= FIREBASE MODULE ================= -->
+<script type="module">
+import { db } from "./firebase-init.js";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+
+// ====================== HR EMPLOYEES ======================
+const hrTableBody = document.getElementById("hrTableBody");
+
+async function loadHREmployees() {
+  const snapshot = await getDocs(collection(db, "employees"));
+  let count = 1;
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    if (data.department === "HR") {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${count++}</td>
+        <td>${data.name || "-"}</td>
+        <td>${data.empId || "-"}</td>
+        <td>${data.contact || "-"}</td>
+      `;
+      hrTableBody.appendChild(row);
+    }
+  });
+}
+
+loadHREmployees();
+
+
+// =================================================
+// LEAVE MANAGEMENT — SUBCOLLECTION VERSION
+// =================================================
+
+// Mapping for choose → subcollection name
+const leaveMap = {
+  "Sick": "sick",
+  "Casual": "casual",
+  "Earned": "paid"
+};
+
+// Correct subcollection path:
+// leaves → types → {sick/casual/paid}
+function getLeaveRef(type) {
+  return collection(db, "leaves", "types", leaveMap[type]);
+}
+
+
+// ====================== ADD LEAVE ======================
+const leaveForm = document.getElementById("leaveForm");
+const leaveTableBody = document.getElementById("leaveTableBody");
+
+leaveForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("leaveName").value.trim();
+  const type = document.getElementById("leaveType").value;
+  const from = document.getElementById("leaveFrom").value;
+  const to = document.getElementById("leaveTo").value;
+  const days = document.getElementById("leaveDays").value;
+
+  if (!name || !type || !from || !to) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  try {
+    await addDoc(getLeaveRef(type), {
+      name, type, from, to, days,
+      createdAt: new Date().toISOString()
+    });
+
+    alert("Leave added!");
+
+    leaveForm.reset();
+    loadLeaves();
+
+  } catch (err) {
+    console.error("Error adding leave:", err);
+  }
+});
+
+
+// ====================== AUTO CALCULATE DAYS ======================
+const leaveFrom = document.getElementById("leaveFrom");
+const leaveTo = document.getElementById("leaveTo");
+const leaveDays = document.getElementById("leaveDays");
+
+function calculateLeaveDays() {
+  const from = new Date(leaveFrom.value);
+  const to = new Date(leaveTo.value);
+
+  if (!leaveFrom.value || !leaveTo.value || to < from) {
+    leaveDays.value = "";
+    return;
+  }
+
+  let count = 0;
+  let cur = new Date(from);
+
+  while (cur <= to) {
+    if (cur.getDay() !== 0) count++; // Skip Sunday
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  leaveDays.value = count;
+}
+
+leaveFrom.addEventListener("change", calculateLeaveDays);
+leaveTo.addEventListener("change", calculateLeaveDays);
+
+
+// ====================== LOAD ALL LEAVES FROM 3 SUBCOLLECTIONS ======================
+async function loadLeaves() {
+  leaveTableBody.innerHTML = "";
+
+  let allLeaves = [];
+
+  for (const typeKey in leaveMap) {
+    const subfolder = leaveMap[typeKey];
+
+    const subRef = collection(db, "leaves", "types", subfolder);
+    const snapshot = await getDocs(subRef);
+
+    snapshot.forEach((docSnap) => {
+      allLeaves.push({
+        id: docSnap.id,
+        ...docSnap.data(),
+        subCollection: subfolder
+      });
+    });
+  }
+
+  // Latest first
+  allLeaves.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+
+  allLeaves.forEach((leave) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${leave.name}</td>
+      <td>${leave.type}</td>
+      <td>${leave.from}</td>
+      <td>${leave.to}</td>
+      <td>${leave.days}</td>
+      <td>
+        <button class="hr-action-btn delete"
+          onclick="deleteLeave('${leave.subCollection}', '${leave.id}')">
+          Delete
+        </button>
+      </td>
+    `;
+
+    leaveTableBody.appendChild(row);
+  });
+}
+
+loadLeaves();
+
+
+// ====================== DELETE LEAVE ======================
+window.deleteLeave = async function (subCollection, id) {
+  if (!confirm("Delete this leave record?")) return;
+
+  try {
+    await deleteDoc(doc(db, "leaves", "types", subCollection, id));
+    loadLeaves();
+  } catch (err) {
+    console.error("Error deleting leave:", err);
+  }
+};
+
+</script>
+
+
+</body>
+
+</html>

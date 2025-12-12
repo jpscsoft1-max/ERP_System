@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Purchasing</title>
+  <link rel="stylesheet" href="css/styles.css" />
+    <script type="module" src="firebase-init.js"></script>
+
+  <script> 
+  // Placed in <head> to prevent page from loading unauthorized content      
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+  <style>
+    .purchase-section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .purchase-section h2 {
+      margin-bottom: 10px;
+    }
+   /* ============================
+   MODERN TABLE WITH FULL BORDERS
+   ============================ */
+
+.modern-table {
+  width: 97%;
+  margin-top: 20px;
+  background: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 15px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+  /* REAL border behavior */
+  border-collapse: collapse !important;
+  border: 1px solid #ccc; /* Full outer border */
+}
+
+/* Header */
+.modern-table thead {
+  background-color: #1abc9c;
+  color: #fff;
+}
+
+.modern-table th,
+.modern-table td {
+  padding: 12px 16px;
+  text-align: center;
+
+  /* FULL borders on every cell */
+  border: 1px solid #ccc !important;
+}
+
+/* Remove double border at top */
+.modern-table thead th {
+  border-bottom: 2px solid #ccc !important;
+}
+
+/* Hover effect */
+.modern-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Prevent header hover color change */
+.modern-table thead tr:hover {
+  background-color: #1abc9c !important;
+}
+
+/* Action Buttons */
+.modern-table .action-btn {
+  padding: 6px 10px;
+  margin: 2px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.modern-table .edit-btn {
+  background: #3498db;
+  color: white;
+}
+
+.modern-table .edit-btn:hover {
+  background: #2980b9;
+}
+
+.modern-table .delete-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+.modern-table .delete-btn:hover {
+  background: #c0392b;
+}
+
+
+  </style>
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="left-section">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <p class="company">JPSCUBE ENGINEERS</p>
+      <div class="header-actions">
+        <button class="icon-btn back-btn" onclick="goBack()">←</button>
+        <button class="icon-btn home-btn" onclick="goHome()">🏠</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="nav-icons">
+        <span class="notification-icon">🔔</span>
+        <span class="profile-icon">👤 Admin</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="Departments.html">Departments</a></li>
+      <li><a href="WorkOrder.html">Work Order</a></li>
+      <li><a href="Purchasing.html">Purchasing</a></li>
+      <li><a href="Sales.html">Sales</a></li>
+      <li><a href="inventory.html">Inventory</a></li>
+      <li><a href="finance.html">Finance</a></li>
+      <li><a href="employees.html">Employees</a></li>
+      <li><a href="generatelogin.html">Generate Login Details</a></li>
+      <li><a href="Companyinfo.html">Company Info</a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <h1>Purchasing</h1>
+    <p>Manage your purchasing operations here.</p>
+
+    <select id="purchaseSelector" class="purchase-dropdown">
+  <option value="" selected disabled>-- Select Section --</option>
+  <option value="vendors">Vendors</option>
+  <option value="quotes">Purchase Quotes</option>
+  <option value="orders">Purchase Order</option>
+  <option value="invoices">Purchase Invoice</option>
+  <option value="returns">Purchase Return Order</option>
+</select>
+
+
+    <div id="vendors" class="purchase-section">
+      <h2>Add Vendor</h2>
+      <form id="vendorForm" onsubmit="saveVendor(event)">
+        <input type="text" id="vendorId" name="vendorId" placeholder="Vendor ID" required />
+        <input type="text" id="vendorName" placeholder="Vendor Name" name="vendorName" required />
+        <input type="email" id="vendorEmail" placeholder="Email ID" name="email" required />
+        <input type="tel" id="vendorMobile" placeholder="Mobile No." name="mobile" required />
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 20px;">
+          <label style="margin-right: 10px;">GSTNO / PAN NO:</label>
+          <label><input type="radio" name="vendorIdType" value="GST" onchange="toggleVendorIdInput()"> GST No.</label>
+          <label><input type="radio" name="vendorIdType" value="PAN" onchange="toggleVendorIdInput()"> PAN No.</label>
+        </div>
+        <div id="vendorIdInputContainer" style="margin-top: 10px;"></div>
+
+        <h3>Address</h3>
+        <textarea name="vendorAddress" id="vendorAddress" placeholder="Enter Vendor Address" required></textarea>
+
+        <br><br>
+        <button type="submit">Save Vendor</button>
+      </form>
+
+      <input type="text" id="searchVendor" placeholder="Search vendors..." oninput="filterVendors()">
+
+      <table id="vendorTable" class="customer-table modern-table" border="1" cellpadding="5" cellspacing="0">
+
+        <thead>
+          <tr>
+            <th>Vendor ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>GST/PAN</th>
+            <th>Address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="vendorTableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="quotes" class="purchase-section">
+      <h2>Purchase Quotes</h2>
+
+      <!-- Vendor Dropdown -->
+      <div class="form-row" style="display: flex; gap: 10px; align-items: center;">
+        <label for="vendorSelect"><strong>Select Vendor:</strong></label>
+        <select id="vendorSelect" onchange="showVendorDetails()">
+          <option value="">-- Select Vendor --</option>
+        </select>
+      </div>
+
+      <!-- Quotation No & Date Below -->
+      <div class="form-row" style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+        <label for="purchaseQuotationNo"><strong>Quotation No:</strong></label>
+        <input type="text" id="purchaseQuotationNo" />
+
+        <label for="purchaseQuotationDate"><strong>Quotation Date:</strong></label>
+        <input type="date" id="purchaseQuotationDate" />
+      </div>
+
+      <div id="vendorInfo" style="margin-top: 20px; display: none;">
+
+        <!-- Quotation Items -->
+        <div style="margin-top: 20px;">
+          <h3>Quotation Items</h3>
+          <table id="purchaseItemsTable" border="1" cellpadding="5" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Sr No.</th>
+                <th>Item Description</th>
+                <th>Item Code</th>
+                <th>HSN/SAC</th>
+                <th>Qty</th>
+                <th>Rate Per-Each</th>
+                <th>GST%</th>
+                <th>Tax</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="purchaseItemsBody"></tbody>
+          </table>
+          <button type="button" onclick="addPurchaseItem()">+ Add Item</button>
+          <br><br>
+          <p><strong>Grand Total: ₹<span id="grandTotal">0.00</span></strong></p>
+        </div>
+
+        <p><strong>Vendor Name:</strong> <span id="vendName"></span></p>
+        <p><strong>Address:</strong> <span id="vendAddress"></span></p>
+        <p><strong>GSTIN / PAN:</strong> <span id="vendId"></span></p>
+        <p><strong>Mobile No:</strong> <span id="vendMob"></span></p>
+      </div>
+
+    </div>
+
+    <div id="orders" class="purchase-section">
+      <h2>Purchase Orders</h2>
+      <p>Manage purchase orders here.</p>
+    </div>
+
+    <div id="invoices" class="purchase-section">
+      <h2>Purchase Invoices</h2>
+      <p>Manage purchase invoices here.</p>
+    </div>
+
+    <div id="returns" class="purchase-section">
+      <h2>Purchase Return Orders</h2>
+      <p>Manage purchase return orders here.</p>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { db } from './firebase-init.js';
+    import {
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      updateDoc,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    function goBack() {
+      window.history.back();
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    const currentPage = window.location.pathname.split("/").pop();
+    const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
+    sidebarLinks.forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+
+    // 📌 Event listener attached without inline HTML attributes
+document.getElementById("purchaseSelector").addEventListener("change", (e) => {
+  handlePurchaseChange(e.target.value);
+});
+
+// 📌 Core function to handle purchase section change
+function handlePurchaseChange(value) {
+  const sections = document.querySelectorAll(".purchase-section");
+  sections.forEach(section => section.style.display = "none");
+
+  if (!value) return;
+
+  const selectedSection = document.getElementById(value);
+  if (selectedSection) {
+    selectedSection.style.display = "block";
+  }
+
+  if (value === "quotes") {
+    populateVendorDropdown(); // ✅ Assumes this function is defined elsewhere
+    setupPurchaseQuotationDate(); // ✅ Same here
+  }
+}
+
+    
+
+    function deleteVendor(index) {
+      if (confirm("Are you sure you want to delete this vendor?")) {
+        const vendors = JSON.parse(localStorage.getItem("vendors") || "[]");
+        vendors.splice(index, 1);
+        localStorage.setItem("vendors", JSON.stringify(vendors));
+        renderVendors();
+      }
+    }
+
+    // Render on page load
+    window.addEventListener("DOMContentLoaded", renderVendors);
+    function toggleVendorIdInput() {
+    const selected = document.querySelector('input[name="vendorIdType"]:checked')?.value;
+    const container = document.getElementById("vendorIdInputContainer");
+    if (selected === "GST") {
+      container.innerHTML = '<input type="text" id="gstPanInput" name="gstPan" placeholder="Enter GST No." required />';
+    } else if (selected === "PAN") {
+      container.innerHTML = '<input type="text" id="gstPanInput" name="gstPan" placeholder="Enter PAN No." required />';
+    } else {
+      container.innerHTML = '';
+    }
+  }
+    window.toggleVendorIdInput = toggleVendorIdInput; // expose for inline HTML use
+
+
+   async function saveVendor(event) {
+    event.preventDefault();
+    const form = document.getElementById("vendorForm");
+    const formData = new FormData(form);
+
+    const selectedIdType = document.querySelector('input[name="vendorIdType"]:checked')?.value;
+    const gstPanInput = document.getElementById("gstPanInput")?.value || "";
+
+    const vendor = {
+      id: formData.get("vendorId"),
+      name: formData.get("vendorName"),
+      email: formData.get("email"),
+      mobile: formData.get("mobile"),
+      gstPanType: selectedIdType || "",
+      gstPan: gstPanInput,
+      address: formData.get("vendorAddress"),
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      await addDoc(collection(db, "vendors"), vendor);
+      alert("✅ Vendor saved to Firebase!");
+      form.reset();
+      document.getElementById("vendorIdInputContainer").innerHTML = ""; // clear dynamic GST/PAN input
+      // Optionally call renderVendors() to refresh UI
+    } catch (error) {
+      console.error("❌ Error saving vendor to Firebase:", error);
+      alert("❌ Failed to save vendor. Check console for errors.");
+    }
+  }
+  window.saveVendor = saveVendor; // attach to global scope so it works with onsubmit
+
+    const tbody = document.getElementById("vendorTableBody");
+
+// Function to render vendors from Firebase
+async function renderVendors() {
+  tbody.innerHTML = ""; // Clear existing rows
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "vendors"));
+
+    if (querySnapshot.empty) {
+      tbody.innerHTML = `<tr><td colspan="7">No vendors found in Firebase.</td></tr>`;
+      return;
+    }
+
+    querySnapshot.forEach((docSnap, index) => {
+      const v = docSnap.data();
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${v.id}</td>
+        <td>${v.name}</td>
+        <td>${v.email}</td>
+        <td>${v.mobile}</td>
+        <td>${v.gstPan}</td>
+        <td>${v.address}</td>
+        <td>
+          <button class="edit-btn" onclick="editVendor('${docSnap.id}')">Edit</button>
+          <button class="delete-btn" onclick="deleteVendor('${docSnap.id}')">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (error) {
+    console.error("Error loading vendors:", error);
+    tbody.innerHTML = `<tr><td colspan="7">Error loading vendors.</td></tr>`;
+  }
+}
+
+// Call function on page load
+
+    function editVendor(index) {
+      const vendors = JSON.parse(localStorage.getItem("vendors") || "[]");
+      const v = vendors[index];
+      const row = document.querySelectorAll("#vendorTableBody tr")[index];
+      row.innerHTML = `
+    <td><input type="text" value="${v.id}" id="editId${index}"></td>
+    <td><input type="text" value="${v.name}" id="editName${index}"></td>
+    <td><input type="email" value="${v.email}" id="editEmail${index}"></td>
+    <td><input type="tel" value="${v.mobile}" id="editMobile${index}"></td>
+    <td><input type="text" value="${v.gstPan}" id="editGST${index}"></td>
+    <td><textarea id="editAddress${index}">${v.address}</textarea></td>
+    <td>
+      <button onclick="saveEditedVendor(${index})">Save</button>
+      <button onclick="renderVendors()">Cancel</button>
+    </td>
+  `;
+    }
+
+    function saveEditedVendor(index) {
+      const vendors = JSON.parse(localStorage.getItem("vendors") || "[]");
+      vendors[index].id = document.getElementById(`editId${index}`).value;
+      vendors[index].name = document.getElementById(`editName${index}`).value;
+      vendors[index].email = document.getElementById(`editEmail${index}`).value;
+      vendors[index].mobile = document.getElementById(`editMobile${index}`).value;
+      vendors[index].gstPan = document.getElementById(`editGST${index}`).value;
+      vendors[index].address = document.getElementById(`editAddress${index}`).value;
+      localStorage.setItem("vendors", JSON.stringify(vendors));
+      renderVendors();
+    }
+
+    function filterVendors() {
+      const query = document.getElementById("searchVendor").value.toLowerCase();
+      const rows = document.querySelectorAll("#vendorTableBody tr");
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? "" : "none";
+      });
+    }
+
+    function populateVendorDropdown() {
+      const vendors = JSON.parse(localStorage.getItem("vendors") || "[]");
+      const dropdown = document.getElementById("vendorSelect");
+
+      if (!dropdown) return;
+
+      dropdown.innerHTML = `<option value="">-- Select Vendor --</option>`;
+
+      vendors.forEach((vend, index) => {
+        const opt = document.createElement("option");
+        opt.value = index;
+        opt.textContent = vend.name;
+        dropdown.appendChild(opt);
+      });
+    }
+
+    function showVendorDetails() {
+      const index = document.getElementById("vendorSelect").value;
+      const vendors = JSON.parse(localStorage.getItem("vendors") || "[]");
+
+      if (index === "") {
+        document.getElementById("vendorInfo").style.display = "none";
+        return;
+      }
+
+      const v = vendors[index];
+      document.getElementById("vendName").textContent = v.name;
+      document.getElementById("vendId").textContent = v.gstPan || "-";
+      document.getElementById("vendAddress").textContent = v.address || "-";
+      document.getElementById("vendMob").textContent = v.mobile || "-";
+      document.getElementById("vendorInfo").style.display = "block";
+    }
+    function addPurchaseItem() {
+      const tbody = document.getElementById("purchaseItemsBody");
+      const rowCount = tbody.rows.length + 1;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+    <td class="serial">${rowCount}</td>
+    <td><textarea class="desc" placeholder="Item Description"></textarea></td>
+    <td><input type="text" class="code" placeholder="Item Code"></td>
+    <td><input type="text" class="hsn" placeholder="HSN/SAC"></td>
+    <td><input type="number" class="qty" value="1" min="1" onchange="calculatePurchaseTotals()"></td>
+    <td><input type="text" class="rate" value="0" oninput="formatIndianNumber(this); calculatePurchaseTotals()"></td>
+    <td class="gst-label">18%</td>
+    <td class="tax-amount">₹0.00</td>
+    <td class="line-total">₹0.00</td>
+    <td><button class="remove-item-btn" onclick="removePurchaseItem(this)">✖</button></td>
+  `;
+      tbody.appendChild(row);
+      renumberPurchaseRows();
+      calculatePurchaseTotals();
+    }
+    function setupPurchaseQuotationDate() {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("purchaseQuotationDate").value = today;
+    }
+
+    function removePurchaseItem(btn) {
+      btn.closest("tr").remove();
+      renumberPurchaseRows();
+      calculatePurchaseTotals();
+    }
+
+    function renumberPurchaseRows() {
+      document.querySelectorAll("#purchaseItemsBody .serial").forEach((cell, idx) => {
+        cell.textContent = idx + 1;
+      });
+    }
+
+    function calculatePurchaseTotals() {
+      const rows = document.querySelectorAll("#purchaseItemsBody tr");
+      let grandTotal = 0;
+
+      const vendors = JSON.parse(localStorage.getItem("vendors") || "[]");
+      const selectedIndex = document.getElementById("vendorSelect").value;
+      const gstNo = vendors[selectedIndex]?.gstPan || "";
+      const isGujarat = gstNo.startsWith("24");
+
+      rows.forEach((row, index) => {
+        const qtyInput = row.querySelector(".qty");
+        const rateInput = row.querySelector(".rate");
+
+        let qty = parseFloat(qtyInput.value) || 0;
+        let rate = parseFloat(rateInput.value.replace(/,/g, "")) || 0;
+
+        if (qty <= 0) {
+          alert(`Row ${index + 1}: Quantity must be greater than zero.`);
+          qtyInput.value = 1;
+          qty = 1;
+        }
+
+        if (rate < 0) {
+          alert(`Row ${index + 1}: Rate cannot be negative.`);
+          rateInput.value = 0;
+          rate = 0;
+        }
+
+        const gstText = row.querySelector(".gst-label").textContent.trim();
+        const gstPercent = parseFloat(gstText.replace('%', '')) || 0;
+
+        const baseTotal = qty * rate;
+        const taxAmount = (baseTotal * gstPercent) / 100;
+        const total = baseTotal + taxAmount;
+
+        const taxCell = row.querySelector(".tax-amount");
+        taxCell.textContent = isGujarat
+          ? `₹${(taxAmount / 2).toLocaleString("en-IN")} + ₹${(taxAmount / 2).toLocaleString("en-IN")}`
+          : `₹${taxAmount.toLocaleString("en-IN")} (IGST)`;
+
+        row.querySelector(".line-total").textContent = `₹${total.toLocaleString("en-IN")}`;
+
+        grandTotal += total;
+      });
+
+      document.getElementById("grandTotal").textContent = grandTotal.toLocaleString("en-IN");
+    }
+
+    // Add commas in Indian number format
+    function formatIndianNumber(input) {
+      const raw = input.value.replace(/,/g, "").trim();
+      if (!raw || isNaN(raw)) {
+        input.value = "";
+        return;
+      }
+      const num = parseFloat(raw);
+      input.value = num.toLocaleString("en-IN");
+    }
+
+    
+
+  </script>
+  <script src="js/rolepermission.js"></script>
+  <!-- <script src="js/common.js"></script> -->
+<!-- <script> checkLogin(); </script> -->
+
+</body>
+
+</html>
