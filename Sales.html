@@ -3,173 +3,24 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sales Department</title>
+  <title>Sales</title>
+  <!-- CHANGE: Company favicons -->
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
   <link rel="stylesheet" href="css/styles.css" />
+  <!-- <script type="module" src="Sales.js"></script> -->
+
   <style>
-    table {
-      border-collapse: collapse;
-      width: 60%;
+    .sales-section {
+      display: none;
       margin-top: 20px;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-bottom: 40px;
     }
 
-    th,
-    td {
-      text-align: center;
-      padding: 12px;
+    .sales-section h2 {
+      margin-bottom: 10px;
     }
-
-    th {
-      background-color: #f4f4f4;
-      color: #000000;
-      font-weight: bold;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    tr:nth-child(odd) {
-      background-color: #ffffff;
-    }
-
-    tr:hover {
-      background-color: #eaf9ff;
-    }
-
-    /* invoice tabe */
-    .invoiceTable {
-      border-collapse: collapse;
-      width: 90%;
-      margin-top: 20px;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-bottom: 40px;
-    }
-
-    /* === Sales Invoice Form Styling === */
-    .invoice-form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .invoice-form input,
-    .invoice-form select,
-    .invoice-form button {
-      padding: 8px 10px;
-      font-size: 14px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-
-    .invoice-form input:focus,
-    .invoice-form select:focus {
-      outline: none;
-      border-color: #007bff;
-    }
-
-    .invoice-form button {
-      background-color: #1abc9c;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
-
-    .invoice-form button:hover {
-      background-color: #24d5b2;
-    }
-
-    /* === Invoice Table Styling === */
-    /* Modern Invoice Table (safe upgrade) */
-.invoiceTable {
-  width: 100%;
-  border-collapse: collapse;
-  background: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 15px;
-}
-
-/* Header */
-.invoiceTable thead tr,
-.invoiceTable thead th {
-  background-color: #1abc9c !important;
-  color: white !important;
-}
-
-
-.invoiceTable th {
-  padding: 14px 16px;
-  font-weight: 600;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-/* Table Body */
-.invoiceTable td {
-  padding: 12px 16px;
-  text-align: center;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-/* Hover Effect */
-.invoiceTable tbody tr:hover {
-  background-color: #f8fdfc;
-}
-
-/* Inputs inside table only */
-.invoiceTable input,
-.invoiceTable select {
-  width: 100%;
-  padding: 6px 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  background: #fff;
-}
-
-/* Action Buttons Styling */
-.invoiceTable button {
-  margin: 2px;
-  padding: 6px 12px;
-  font-size: 13px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-/* Save Button */
-.invoiceTable button:nth-child(1) {
-  background-color: #28a745;
-  color: white;
-}
-.invoiceTable button:nth-child(1):hover {
-  background-color: #218838;
-}
-
-/* Delete Button */
-.invoiceTable button:nth-child(2) {
-  background-color: #dc3545;
-  color: white;
-}
-.invoiceTable button:nth-child(2):hover {
-  background-color: #c82333;
-}
-
-/* Prevent header hover from turning white */
-.invoiceTable thead tr:hover {
-  background-color: #1abc9c;
-}
-
   </style>
 </head>
 
@@ -177,7 +28,7 @@
   <!-- Top Navigation Bar -->
   <div class="top-nav">
     <div class="left-section">
-      <img class="logo" src="LOGO_V1preview.png" alt="logo">
+      <img class="logo" src="LOGO_V1preview.png" alt="logo" />
       <p class="company">JPSCUBE ENGINEERS</p>
       <div class="header-actions">
         <button class="icon-btn back-btn" onclick="goBack()">←</button>
@@ -187,19 +38,19 @@
     <div class="right-section">
       <input type="text" placeholder="Search..." class="search-bar" />
       <div class="nav-icons">
-        <span class="notification-icon" onclick="toggleNotification()">🔔</span>
-        <span class="profile-icon" onclick="toggleProfileDropdown()">👤 Admin</span>
-      </div>
-      <div id="notificationDropdown" class="dropdown-menu" style="display: none;">
-        <a href="#">No new notifications</a>
-      </div>
-      <div id="profileDropdown" class="dropdown-menu" style="display: none;">
-        <a href="#">Profile</a>
-        <a href="login.html">Logout</a>
+        <!-- <span class="notification-icon">🔔</span> -->
+        <span class="notification-icon" id="notificationIcon">🔔</span>
+        <div class="notification-panel" id="notificationPanel">
+          <h4>Notifications</h4>
+          <ul id="notificationList">
+            <li>No new notifications</li>
+          </ul>
+        </div>
+        <span class="profile-icon">👤 Admin</span>
       </div>
     </div>
   </div>
-  <!-- Sidebar -->
+
   <div class="sidebar">
     <ul>
       <li><a href="index.html">Home</a></li>
@@ -215,270 +66,330 @@
     </ul>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
-    <h1>Sales Department</h1>
-    <h2>Sales Employees</h2>
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Sr No</th>
-          <th>Name</th>
-          <th>Emp ID</th>
-          <th>Mob No</th>
-        </tr>
-      </thead>
-      <tbody id="salesDepartmentTable"></tbody>
-    </table>
-    <hr> <br>
-    <!-- Sales Invoice Section -->
-    <h2>Sales Invoice</h2> <br>
-    <!-- Invoice Entry Form -->
-    <div class="invoice-form">
-      <input type="text" id="invoiceNumber" placeholder="Invoice Number" />
-      <input type="text" id="customerName" placeholder="Customer Name" />
-      <input type="number" id="invoiceAmount" placeholder="Amount" />
-      <input type="date" id="invoiceDate" />
-      <select id="invoiceStatus">
-        <option value="">Status</option>
-        <option value="Pending">Pending</option>
-        <option value="Paid">Paid</option>
-      </select>
-      <button onclick="addInvoice()">Add Invoice</button>
+    <h1>Sales</h1>
+    <p>Manage your sales operations here.</p>
+    <select id="salesSelector" class="purchase-dropdown" onchange="handleSalesChange(this.value)">
+      <option value="" selected disabled>-- Select Section --</option>
+      <option value="customers">Customers</option>
+      <option value="quotes">Sales Quotes</option>
+      <option value="orders">Sales Orders</option>
+      <option value="invoices">Sales Invoice</option>
+      <option value="returns">Sales Return Order</option>
+    </select>
+
+    <div id="customers" class="sales-section">
+      <h2>Add Customer</h2>
+      <form id="customerForm" onsubmit="saveCustomer(event)">
+        <input type="text" id="customerName" placeholder="Customer Name" name="customerName" required />
+        <input type="email" id="customerEmail" placeholder="Email ID" name="email" required />
+        <input type="tel" id="customerMobile" placeholder="Mobile No." name="mobile" required />
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 20px;">
+          <label style="margin-right: 10px;">GSTNO / PAN NO:</label>
+          <label>
+            <input type="radio" name="idType" value="GST" onchange="toggleIdInput()" required> GST No.
+          </label>
+          <label>
+            <input type="radio" name="idType" value="PAN" onchange="toggleIdInput()" required> PAN No.
+          </label>
+        </div>
+        <div id="idInputContainer" style="margin-top: 10px;"></div>
+
+        <h3>Billing Address</h3>
+        <textarea name="billingAddress" placeholder="Billing Address" required></textarea>
+
+        <h3>Shipping Address</h3>
+
+        <div id="shippingAddresses">
+          <div class="shipping-group">
+            <textarea name="shippingAddress[]" placeholder="Shipping Address" required></textarea>
+            <div class="same-as-billing-container">
+              <label>
+                <input type="checkbox" class="same-as-billing" onchange="copyBillingAddress(this)">
+                Same as billing address
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onclick="addShippingAddress()">Add Another Shipping Address</button>
+        <br><br>
+        <button type="submit">Save Customer</button>
+      </form>
+      <input type="text" id="searchInput" placeholder="Search customers..." oninput="filterCustomers()">
+      <table id="customerTable" class="customer-table" border="1" cellpadding="5" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>GST/PAN</th>
+            <th>Billing Address</th>
+            <th>Shipping Addresses</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customerTableBody"></tbody>
+      </table>
+
     </div>
 
-    <table class="invoiceTable">
-      <thead>
-        <tr>
-          <th>Sr No</th>
-          <th>Invoice ID</th>
-          <th>Customer Name</th>
-          <th>Amount</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="invoiceTableBody">
-        <!-- Invoices will be added here dynamically -->
-      </tbody>
-    </table>
 
+    <div id="quotes" class="sales-section">
+      <h2>Sales Quotes</h2>
+
+      <!-- <div class="form-row">
+        <label for="customerSelect"><strong>Select Customer:</strong></label>
+        <select id="customerSelect" onchange="showCustomerDetails()">
+          <option value="">-- Select Customer --</option>
+        </select>
+      </div> -->
+   <!-- ===== Searchable dropdown for Sales Quotes (replace old input/datalist) ===== -->
+<div class="form-row" style="position:relative;">
+  <label for="quoteCustomerIndex"><strong>Select Customer:</strong></label>
+
+  <div class="searchable-select customer-dropdown" id="quoteCustomerWrapper" style="display:inline-block;">
+    <button type="button" class="searchable-select-toggle" id="quoteCustomerToggle">
+      <span id="quoteCustomerLabel">-- Select Customer --</span>
+      <span class="caret">▾</span>
+    </button>
+
+    <div class="searchable-select-menu" id="quoteCustomerMenu" style="display:none; position:absolute; z-index:999; background:#fff; border:1px solid #ddd; padding:8px; width:300px;">
+      <input type="text" id="quoteCustomerSearch" class="searchable-select-input" placeholder="Search customer..." autocomplete="off" style="width:100%; box-sizing:border-box;"/>
+      <ul id="quoteCustomerList" style="list-style:none; padding-left:0; max-height:220px; overflow:auto; margin-top:8px;"></ul>
+    </div>
   </div>
 
+  <!-- Hidden input used to store selected index for quotes -->
+  <input type="hidden" id="quoteCustomerIndex" />
+</div>
 
-  <!-- Firebase Scripts -->
-  <script type="module">
-    import { db } from './firebase-init.js';
-    import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-    async function loadSalesEmployees() {
-      const tableBody = document.getElementById('salesDepartmentTable');
-      const employeesRef = collection(db, "employees");
 
-      try {
-        const querySnapshot = await getDocs(employeesRef);
-        let srNo = 1;
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.department && data.department.toLowerCase() === "sales") {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-            <td>${srNo++}</td>
-            <td>${data.name || ''}</td>
-            <td>${data.empId || ''}</td>
-            <td>${data.contact || ''}</td>
-          `;
-            tableBody.appendChild(row);
-          }
-        });
-      } catch (error) {
-        console.error("Error loading employees:", error);
-      }
+      <div class="form-row">
+        <label for="quotationNo"><strong>Quotation No:</strong></label>
+        <input type="text" id="quotationNo" />
+
+        <label for="quotationDate" style="margin-left: 20px;"><strong>Quotation Date:</strong></label>
+        <input type="date" id="quotationDate" />
+      </div>
+
+      <div id="customerInfo" style="margin-top: 20px; display: none;">
+        <p><strong>Customer Name:</strong> <span id="custName"></span></p>
+        <p><strong>Address:</strong> <span id="custAddress"></span></p>
+        <p><strong>GSTIN / PAN:</strong> <span id="custId"></span></p>
+        <p><strong>Mobile No:</strong> <span id="custMob"></span></p>
+        <!-- Quotation Items Section -->
+        <div style="margin-top: 20px;">
+          <h3>Quotation Items</h3>
+          <table id="quotationItems" border="1" cellpadding="5" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Sr No.</th>
+                <th>Item Description</th>
+                <th>Item Code</th>
+                <th>HSN/SAC</th>
+                <th>Qty</th>
+                <th>Rate Per-each</th>
+                <th>GST %</th>
+                <th>Tax</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody">
+              <!-- Dynamic rows go here -->
+            </tbody>
+          </table>
+          <button type="button" onclick="addQuotationItem()">+ Add Item</button>
+          <br><br>
+          <!-- <p><strong>Grand Total: ₹<span id="grandTotal">0.00</span></strong></p>
+            -->
+          <p><strong>Grand Total: ₹<span id="orderGrandTotal">0.00</span></strong></p>
+
+          <button class="print-btn" onclick="previewQuotation()">🖨️ Print Sales Quote</button>
+          <!-- 🔘 Print Quote Button -->
+
+        </div>
+      </div>
+    </div>
+
+    <div id="orders" class="sales-section">
+      <h2>Sales Orders</h2>
+
+      <!-- <div class="sales-orders-row">
+        <label for="orderCustomer"><strong>Select Customer:</strong></label>
+        <select id="orderCustomer" class="order-customer-dropdown" onchange="showOrderCustomerDetails()">
+          <option value="">-- Select Customer --</option>
+        </select>
+      </div> -->
+<!-- Safe searchable dropdown for Orders (unique ids) -->
+<div class="sales-orders-row" style="position:relative;">
+  <label for="orderCustomerIndex"><strong>Select Customer:</strong></label>
+
+  <div class="searchable-select customer-dropdown" id="orderCustomerWrapper" style="display:inline-block;">
+    <button type="button" class="searchable-select-toggle" id="orderCustomerToggle">
+      <span id="orderCustomerLabel">-- Select Customer --</span>
+      <span class="caret">▾</span>
+    </button>
+
+    <div class="searchable-select-menu" id="orderCustomerMenu" style="display:none; position:absolute; z-index:999; background:#fff; border:1px solid #ddd; padding:8px; width:260px;">
+      <input type="text" id="orderCustomerSearch" class="searchable-select-input" placeholder="Search customer..." autocomplete="off" style="width:100%; box-sizing:border-box;"/>
+      <ul id="orderCustomerList" style="list-style:none; padding-left:0; max-height:220px; overflow:auto; margin-top:8px;"></ul>
+    </div>
+  </div>
+
+  <!-- Hidden input used to store selected index (safe unique id) -->
+  <input type="hidden" id="orderCustomerIndex" onchange="showOrderCustomerDetailsFromIndex()" />
+</div>
+
+      <div class="sales-orders-row">
+        <label for="orderNo"><strong>Order No:</strong></label>
+        <input type="text" id="orderNo" class="sales-orders-input" />
+
+        <label class="sales-orders-label" for="orderDate" style="margin-left: 20px;"><strong>Order
+            Date:</strong></label>
+        <input type="date" id="orderDate" class="sales-orders-input" />
+      </div>
+
+      <div id="orderCustomerInfo" class="sales-orders-details" style="margin-top: 20px; display: none;">
+        <p><strong>Customer Name:</strong> <span id="orderCustName"></span></p>
+        <p><strong>Address:</strong> <span id="orderCustAddress"></span></p>
+        <p><strong>GSTIN / PAN:</strong> <span id="orderCustId"></span></p>
+        <p><strong>Mobile No:</strong> <span id="orderCustMob"></span></p>
+      </div>
+      <!-- Sales Order Items Section -->
+      <div style="margin-top: 20px;">
+        <h3>Order Items</h3>
+        <table id="orderItems" border="1" cellpadding="5" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Sr No.</th>
+              <th>Item Description</th>
+              <th>Item Code</th>
+              <th>HSN/SAC</th>
+              <th>Qty</th>
+              <th>Rate Per-each</th>
+              <th>GST %</th>
+              <th>Tax</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="orderItemsBody">
+            <!-- Rows go here -->
+
+          </tbody>
+        </table>
+        <button type="button" onclick="addOrderItem()">+ Add Item</button>
+        <br><br>
+        <p><strong>Grand Total: ₹<span id="grandTotal">0.00</span></strong></p>
+        <button class="print-btn">🖨️ Print Sales Order</button> <!-- Placeholder for now -->
+      </div>
+    </div>
+
+    <div id="invoices" class="sales-section invoice-section">
+      <h2>Sales Invoices</h2>
+
+      <!-- <div class="form-row">
+        <label for="invoiceCustomer"><strong>Select Customer:</strong></label>
+        <select id="invoiceCustomer" onchange="showInvoiceCustomerDetails()">
+          <option value="">-- Select Customer --</option>
+        </select>
+      </div> -->
+      <div class="form-row">
+        <label for="invoiceCustomer"><strong>Select Customer:</strong></label>
+
+        <!-- Custom searchable dropdown -->
+        <div class="searchable-select" id="invoiceCustomerWrapper">
+          <!-- Visible button jise click karke dropdown open hoga -->
+          <button type="button" class="searchable-select-toggle" id="invoiceCustomerToggle">
+            <span id="invoiceCustomerLabel">-- Select Customer --</span>
+            <span class="caret">▾</span>
+          </button>
+
+          <!-- Dropdown menu -->
+          <div class="searchable-select-menu" id="invoiceCustomerMenu">
+            <!-- 🔍 Search row inside dropdown -->
+            <input type="text" id="invoiceCustomerSearch" class="searchable-select-input"
+              placeholder="Search customer..." />
+
+            <!-- Options list yaha JS se aayenge -->
+            <ul id="invoiceCustomerList"></ul>
+          </div>
+        </div>
+
+
+        <input type="hidden" id="invoiceCustomer" onchange="showInvoiceCustomerDetails()" />
+      </div>
+
+
+      <div class="form-row">
+        <label for="invoiceDate"><strong>Invoice Date:</strong></label>
+        <input type="date" id="invoiceDate" />
+      </div>
+
+      <div id="invoiceCustomerInfo" style="margin-top: 20px; display: none;">
+        <p><strong>Customer Name:</strong> <span id="invoiceCustName"></span></p>
+        <p><strong>Address:</strong> <span id="invoiceCustAddress"></span></p>
+        <p><strong>GSTIN / PAN:</strong> <span id="invoiceCustId"></span></p>
+        <p><strong>Mobile No:</strong> <span id="invoiceCustMob"></span></p>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <h3>Invoice Items</h3>
+        <table id="invoiceItems" border="1" cellpadding="5" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Sr No.</th>
+              <th>Item Description</th>
+              <th>Item Code</th>
+              <th>HSN/SAC</th>
+              <th>Qty</th>
+              <th>Rate Per-each</th>
+              <th>GST %</th>
+              <th>Tax</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceItemsBody"></tbody>
+        </table>
+        <button type="button" onclick="addInvoiceItem()">+ Add Item</button>
+        <br><br>
+        <p><strong>Grand Total: ₹<span id="grandTotal">0.00</span></strong></p>
+        <button class="print-btn">🖨️ Print Invoice</button>
+      </div>
+    </div>
+
+
+    <div id="returns" class="sales-section">
+      <h2>Sales Return Orders</h2>
+      <p>Manage sales return orders here.</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/Sales.js"></script>
+  <script src="js/rolepermission.js"></script>
+
+
+  <script src="js/notification.js"></script>
+  <script src="js/login-check.js"></script>
+  <script>function goBack() {
+      window.history.back();
     }
 
-    loadSalesEmployees();
-
-    const invoicesRef = collection(db, "invoices");
-
-    async function loadInvoices() {
-      const tableBody = document.getElementById("invoiceTableBody");
-      tableBody.innerHTML = "";
-      let srNo = 1;
-
-      const querySnapshot = await getDocs(invoicesRef);
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const row = document.createElement("tr");
-        row.innerHTML = `
-      <td>${srNo++}</td>
-      <td>${data.invoiceNumber || ""}</td>
-      <td>${data.customerName || ""}</td>
-      <td>${data.amount || ""}</td>
-      <td>${data.date || ""}</td>
-      <td>${data.status || ""}</td>
-      <td>
-    <button onclick="editInvoice('${doc.id}')">Edit</button>
-    <button onclick="deleteInvoice('${doc.id}')">Delete</button>
-      </td>
-    `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    async function addInvoice() {
-      const invoiceNumber = document.getElementById("invoiceNumber").value;
-      const customerName = document.getElementById("customerName").value;
-      const amount = document.getElementById("invoiceAmount").value;
-      const date = document.getElementById("invoiceDate").value;
-      const status = document.getElementById("invoiceStatus").value;
-
-      if (!invoiceNumber || !customerName || !amount || !date || !status) {
-        alert("Please fill all fields.");
-        return;
-      }
-
-      try {
-        await addDoc(invoicesRef, {
-          invoiceNumber,
-          customerName,
-          amount: parseFloat(amount),
-          date,
-          status,
-          createdAt: new Date().toISOString()
-        });
-        alert("Invoice added successfully!");
-        loadInvoices();
-
-        // Clear form fields
-        document.getElementById("invoiceNumber").value = "";
-        document.getElementById("customerName").value = "";
-        document.getElementById("invoiceAmount").value = "";
-        document.getElementById("invoiceDate").value = "";
-        document.getElementById("invoiceStatus").value = "";
-      } catch (error) {
-        console.error("Error adding invoice:", error);
-      }
-    }
-    async function deleteInvoice(id) {
-      if (!confirm("Are you sure you want to delete this invoice?")) return;
-
-      try {
-        const docRef = doc(db, "invoices", id);
-        await deleteDoc(docRef);
-        alert("Invoice deleted!");
-        loadInvoices();
-      } catch (error) {
-        console.error("Error deleting invoice:", error);
-      }
-    }
-    window.editInvoice = function (id) {
-      const row = [...document.querySelectorAll('#invoiceTableBody tr')].find(tr =>
-        tr.querySelector('button[onclick*="' + id + '"]')
-      );
-      if (!row) return;
-
-      const cells = row.querySelectorAll("td");
-      const invoiceNumber = cells[1].textContent.trim();
-      const customerName = cells[2].textContent.trim();
-      const amount = cells[3].textContent.trim();
-      const date = cells[4].textContent.trim();
-      const status = cells[5].textContent.trim();
-
-      // Replace text with input fields
-      cells[1].innerHTML = `<input value="${invoiceNumber}" />`;
-      cells[2].innerHTML = `<input value="${customerName}" />`;
-      cells[3].innerHTML = `<input type="number" value="${amount}" />`;
-      cells[4].innerHTML = `<input type="date" value="${date}" />`;
-      cells[5].innerHTML = `
-    <select>
-      <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
-      <option value="Paid" ${status === 'Paid' ? 'selected' : ''}>Paid</option>
-    </select>
-  `;
-
-      // Change buttons
-      cells[6].innerHTML = `
-    <button onclick="saveInvoice('${id}', this)">Save</button>
-    <button onclick="loadInvoices()">Cancel</button>
-  `;
-    };
-
-    window.saveInvoice = async function (id, btn) {
-      const row = btn.closest("tr");
-      const inputs = row.querySelectorAll("input, select");
-
-      const updatedData = {
-        invoiceNumber: inputs[0].value.trim(),
-        customerName: inputs[1].value.trim(),
-        amount: parseFloat(inputs[2].value),
-        date: inputs[3].value,
-        status: inputs[4].value
-      };
-
-      try {
-        const docRef = doc(db, "invoices", id);
-        await updateDoc(docRef, updatedData);
-        alert("Invoice updated successfully.");
-        loadInvoices();
-      } catch (err) {
-        console.error("Error updating invoice:", err);
-      }
-    };
-
-    loadInvoices();
-    window.addInvoice = addInvoice;
-    window.deleteInvoice = deleteInvoice;
-  </script>
-
-  <!-- JS Scripts -->
-  <script>
-    function goBack() {
-      window.history.back(); // Go to previous page
-    }
     function goHome() {
       window.location.href = 'index.html';
     }
-    function toggleNotification() {
-      const notificationDropdown = document.getElementById('notificationDropdown');
-      const profileDropdown = document.getElementById('profileDropdown');
-      profileDropdown.style.display = 'none';
-      notificationDropdown.style.display = (notificationDropdown.style.display === 'block') ? 'none' : 'block';
-    }
+    // CHANGE: Expose navigation functions globally so header buttons work on this page
+    window.goBack = goBack;
+    window.goHome = goHome;
 
-    function toggleProfileDropdown() {
-      const notificationDropdown = document.getElementById('notificationDropdown');
-      const profileDropdown = document.getElementById('profileDropdown');
-      notificationDropdown.style.display = 'none';
-      profileDropdown.style.display = (profileDropdown.style.display === 'block') ? 'none' : 'block';
-    }
-
-    document.addEventListener('click', function (event) {
-      const notificationIcon = document.querySelector('.notification-icon');
-      const profileIcon = document.querySelector('.profile-icon');
-      const notificationDropdown = document.getElementById('notificationDropdown');
-      const profileDropdown = document.getElementById('profileDropdown');
-
-      if (!notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
-        notificationDropdown.style.display = 'none';
-      }
-
-      if (!profileIcon.contains(event.target) && !profileDropdown.contains(event.target)) {
-        profileDropdown.style.display = 'none';
-      }
-    });
-
-    // Active Link Highlight
-    const currentPage = window.location.pathname.split("/").pop();
-    const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
-
-    sidebarLinks.forEach(link => {
-      if (link.getAttribute("href") === currentPage) {
-        link.classList.add("active");
-      }
-    });
   </script>
-  <script src="js/rolepermission.js"></script>
+
+
 </body>
 
 </html>
